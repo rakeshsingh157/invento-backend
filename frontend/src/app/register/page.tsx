@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
+import { Navbar } from "@/components/Navbar";
 
 interface TeamMember {
     name: string;
@@ -67,9 +68,6 @@ export default function Register() {
         // @ts-ignore
         newMembers[index][name as keyof TeamMember] = value;
         setFormData((prev) => ({ ...prev, members: newMembers }));
-
-        // Clear member error if specific key implementation
-        // For simplicity, we might just re-validate on next click or clear generic member errors
     };
 
     const addMember = () => {
@@ -100,27 +98,15 @@ export default function Register() {
     };
 
     const validateStep2 = () => {
-        // We'll just check if any field is empty and show a general error or specific
-        // Since we don't have unique IDs for error mapping easily in the current loop without complexity
-        // We will just return false and alert for now OR improve mapping.
-        // Let's stick to a simple check.
         let isValid = true;
-        const newErrors: { [key: string]: string } = {};
-
-        formData.members.forEach((member, index) => {
+        formData.members.forEach((member) => {
             if (!member.name || !member.contact || !member.email) {
                 isValid = false;
             }
         });
 
         if (!isValid) {
-            // Ideally we map errors to indices, but for now fallback to a global error or simple alert
-            // to keep code simple as per "proper UI" request without over-engineering
-            // causing bugs.
-            // Let's actually use a top level error state for the step.
             alert("Please fill in all member details");
-            // Keeping alert for dynamic list for now is safer than complex state mapping
-            // unless I refactor significantly.
             return false;
         }
         return true;
@@ -132,7 +118,7 @@ export default function Register() {
 
         if (parseInt(userCaptcha) !== captcha.answer) {
             setCaptchaError("Incorrect Captcha Answer");
-            newErrors.captcha = "Incorrect"; // Just to mark invalid
+            newErrors.captcha = "Incorrect";
         } else {
             setCaptchaError("");
         }
@@ -142,12 +128,9 @@ export default function Register() {
     };
 
     const handleNext = () => {
-
         if (step === 1 && validateStep1()) setStep(2);
         if (step === 2 && validateStep2()) setStep(3);
         if (step === 3 && validateStep3()) {
-            // Submit Logic Here (e.g., API call)
-            // For now, just go to success screen
             console.log("Submitting:", formData);
             setStep(4);
         }
@@ -159,18 +142,19 @@ export default function Register() {
 
     if (step === 4) {
         return (
-            <div className="min-h-screen flex items-center justify-center p-4">
+            <div className="min-h-screen bg-brand-yellow font-sans pt-24 pb-10 flex items-center justify-center p-4">
+                <Navbar />
                 <Card className="w-full max-w-lg text-center animate-in fade-in zoom-in duration-500">
-                    <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-500/30">
-                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    <div className="w-20 h-20 bg-green-400 border-4 border-black rounded-full flex items-center justify-center mx-auto mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                        <svg className="w-10 h-10 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
                         </svg>
                     </div>
-                    <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-600 mb-4">
+                    <h2 className="text-4xl font-black text-black mb-4 uppercase tracking-tighter">
                         Registration Successful!
                     </h2>
-                    <p className="text-gray-400 mb-8 text-lg">
-                        Your team <strong>{formData.teamName}</strong> has been registered for Invento Gamathon.
+                    <p className="text-black mb-8 text-lg font-medium border-2 border-black bg-white p-4 rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                        Your team <strong className="bg-brand-pink px-2 text-white transform -rotate-2 inline-block shadow-sm border border-black">{formData.teamName}</strong> has been registered.
                     </p>
                     <Link href="/">
                         <Button fullWidth variant="primary">Back to Home</Button>
@@ -181,35 +165,32 @@ export default function Register() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
-            {/* Progress Bar */}
+        <div className="min-h-screen bg-brand-yellow font-sans pt-24 pb-10 flex flex-col items-center justify-center p-4 md:p-8 relative overflow-hidden">
+            {/* Background Pattern */}
+            <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] bg-size-[16px_16px]"></div>
+
+            <Navbar />
+
             <div className="w-full max-w-2xl mb-8">
-                <div className="flex justify-between mb-2">
+                <div className="flex justify-between mb-2 px-1">
                     {['Team Leader', 'Members', 'College'].map((label, idx) => (
-                        <div key={idx} className={`text-sm font-medium ${step > idx ? 'text-purple-400' : step === idx + 1 ? 'text-white' : 'text-gray-600'}`}>
+                        <div key={idx} className={`text-sm font-black uppercase tracking-widest ${step > idx ? 'text-black' : step === idx + 1 ? 'text-black underline decoration-4 decoration-brand-pink' : 'text-gray-500'}`}>
                             {label}
                         </div>
                     ))}
                 </div>
-                <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                <div className="h-4 bg-white border-4 border-black rounded-full overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                     <div
-                        className="h-full bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 ease-out"
-                        style={{ width: `${((step - 1) / 3) * 100}%` }} // Adjusted to not fill on step 1 completely unless we consider 3 steps + 1 completion.
-                    // Let's make it reflect current progress 
-                    // Step 1: 33%, Step 2: 66%, Step 3: 100%
-                    // Actually simpler:
-                    ></div>
-                    <div
-                        className="h-full bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-500"
+                        className="h-full bg-brand-pink border-r-4 border-black transition-all duration-500"
                         style={{ width: `${step === 1 ? 33 : step === 2 ? 66 : 100}%` }}
                     />
                 </div>
             </div>
 
-            <Card className="w-full max-w-2xl">
-                <div className="mb-8">
-                    <h2 className="text-3xl font-bold text-white mb-2">Register Your Team</h2>
-                    <p className="text-gray-400">Step {step} of 3</p>
+            <Card className="w-full max-w-2xl bg-white">
+                <div className="mb-8 border-b-4 border-black pb-4">
+                    <h2 className="text-4xl font-black text-black mb-2 uppercase tracking-tighter">Register Team</h2>
+                    <p className="text-black font-bold">Step {step} of 3</p>
                 </div>
 
                 {step === 1 && (
@@ -255,11 +236,11 @@ export default function Register() {
                 {step === 2 && (
                     <div className="space-y-6 animate-in slide-in-from-right duration-300">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-lg font-semibold text-white">Team Members</h3>
+                            <h3 className="text-xl font-black text-black uppercase">Team Members</h3>
                             {formData.members.length < 4 && (
                                 <button
                                     onClick={addMember}
-                                    className="text-sm text-purple-400 hover:text-purple-300 font-medium"
+                                    className="text-sm font-bold bg-brand-pink text-white px-3 py-1 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all"
                                 >
                                     + Add Member
                                 </button>
@@ -267,37 +248,37 @@ export default function Register() {
                         </div>
 
                         {formData.members.map((member, index) => (
-                            <div key={index} className="p-4 bg-white/5 rounded-xl border border-white/5 relative group">
+                            <div key={index} className="p-4 bg-gray-50 rounded-xl border-2 border-black relative group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                                 {formData.members.length > 1 && (
                                     <button
                                         onClick={() => removeMember(index)}
-                                        className="absolute top-2 right-2 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        className="absolute top-2 right-2 text-black hover:text-red-500 font-black border-2 border-transparent hover:border-black rounded p-1 transition-all"
                                     >
                                         ✕
                                     </button>
                                 )}
-                                <div className="text-xs text-gray-500 uppercase tracking-widest mb-2 font-bold">Member {index + 1}</div>
+                                <div className="text-xs text-black uppercase tracking-widest mb-3 font-black bg-brand-yellow inline-block px-2 border-2 border-black transform -rotate-1">Member {index + 1}</div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                     <Input
                                         label="Name"
                                         name="name"
                                         value={member.name}
                                         onChange={(e) => handleMemberChange(index, e)}
-                                        className="!bg-black/20"
+                                        className="bg-white!"
                                     />
                                     <Input
                                         label="Contact"
                                         name="contact"
                                         value={member.contact}
                                         onChange={(e) => handleMemberChange(index, e)}
-                                        className="!bg-black/20"
+                                        className="bg-white!"
                                     />
                                     <Input
                                         label="Email"
                                         name="email"
                                         value={member.email}
                                         onChange={(e) => handleMemberChange(index, e)}
-                                        className="!bg-black/20"
+                                        className="bg-white!"
                                     />
                                 </div>
                             </div>
@@ -316,8 +297,8 @@ export default function Register() {
                             error={errors.collegeName}
                         />
 
-                        <div className="p-6 bg-black/30 rounded-xl border border-white/10">
-                            <label className="block text-sm font-medium text-gray-400 mb-3 ml-1">
+                        <div className="p-6 bg-brand-pink/10 rounded-xl border-2 border-black border-dashed">
+                            <label className="block text-md font-black text-black mb-3">
                                 Security Check: What is {captcha.num1} + {captcha.num2}?
                             </label>
                             <Input
@@ -331,7 +312,7 @@ export default function Register() {
                     </div>
                 )}
 
-                <div className="mt-8 flex gap-4 pt-4 border-t border-white/10">
+                <div className="mt-8 flex gap-4 pt-6 border-t-4 border-black">
                     {step > 1 && (
                         <Button
                             variant="outline"
