@@ -1,27 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
-  --primary: #6d28d9;
-  --primary-foreground: #ffffff;
-  --input-bg: #18181b;
-  --input-border: #27272a;
+  --background: #ffffff;
+  --foreground: #18181b;
+  --brand-pink: #f472b6;
+  --brand-yellow: #fbbf24;
+  --brand-orange: #fb923c;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-brand-pink: var(--brand-pink);
+  --color-brand-yellow: var(--brand-yellow);
+  --color-brand-orange: var(--brand-orange);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
 }
 
 body {
-  background: radial-gradient(circle at top center, #1e1b4b, #09090b);
+  background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-sans);
   min-height: 100vh;
   margin: 0;
   overflow-x: hidden;
@@ -29,52 +29,41 @@ body {
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: #fdf2f8;
+  /* pink-50 */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3f3f46;
-  border-radius: 4px;
+  background: #f472b6;
+  /* pink-400 */
+  border-radius: 5px;
+  border: 2px solid #fdf2f8;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #52525b;
+  background: #ec4899;
+  /* pink-500 */
 }
 
-/* Glassmorphism Utilities */
-/* 3D Utilities */
-.perspective-1000 {
-  perspective: 1000px;
+/* Utilities */
+.text-shadow-sm {
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
 }
 
-.preserve-3d {
-  transform-style: preserve-3d;
+.text-shadow {
+  text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
 }
 
-.backface-hidden {
-  backface-visibility: hidden;
+.box-shadow-retro {
+  box-shadow: 8px 8px 0px rgba(0, 0, 0, 1);
+  border: 4px solid black;
 }
 
-/* Animations */
-@keyframes gradient-x {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.animate-gradient-x {
-  background-size: 200% 200%;
-  animation: gradient-x 15s ease infinite;
+.box-shadow-card {
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+  border: 2px solid black;
 }
