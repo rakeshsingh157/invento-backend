@@ -9,6 +9,7 @@ const registerTeam = async (req, res) => {
     const teamData = req.body;
 
     // Validation
+    // Team size: Minimum 1 member (leader only), Maximum 5 members (leader + 4 additional members)
     if (!teamData.team_name) {
       return res.status(400).json({
         success: false,
@@ -16,6 +17,7 @@ const registerTeam = async (req, res) => {
       });
     }
 
+    // Leader is required (minimum 1 member)
     if (!teamData.leader || !teamData.leader.name || !teamData.leader.email || !teamData.leader.phone) {
       return res.status(400).json({
         success: false,

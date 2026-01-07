@@ -52,6 +52,8 @@ Public API endpoint for team registration with automatic email notifications to 
 - `leader.email` - Leader's email (must be valid and unique)
 - `leader.phone` - Leader's phone number
 
+**Note:** You can register with just the leader (1 member) or add up to 4 additional members (5 members total).
+
 #### Optional Fields
 - `idea` - Team's project idea or description (optional)
 - `gameName` - Game name if participating in game development category (optional)
@@ -282,9 +284,9 @@ const registerTeam = async (teamData) => {
 
 ## Notes
 
+- **Team Size:** Minimum 1 member (leader only), Maximum 5 members (leader + 4 additional members)
+- **Solo Registration:** Teams can register with just the leader - other members are optional
 - Team name must be unique
 - Email addresses must be unique across all teams
-- Minimum 1 member (leader) required
-- Maximum 5 members per team
-- Email notifications sent asynchronously
+- Email notifications sent asynchronously to all registered members
 - If email sending fails, team is still registered with a warning message
