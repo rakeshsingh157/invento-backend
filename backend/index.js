@@ -1,5 +1,9 @@
 const express = require("express");
-require('dotenv').config();
+const path = require('path');
+const dotenv = require('dotenv');
+
+
+
 const { connectDB } = require('./src/db/connection/mongodb');
 const authRoutes = require('./src/routes/authRoutes');
 const teamRoutes = require('./src/routes/teamRoutes');
