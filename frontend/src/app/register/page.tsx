@@ -86,12 +86,30 @@ export default function Register() {
         }
     };
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState("");
+
+    const validateEmail = (email: string) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
+    const validatePhone = (phone: string) => {
+        return /^\d{10}$/.test(phone);
+    };
+
     const validateStep1 = () => {
         const newErrors: { [key: string]: string } = {};
-        if (!formData.teamName) newErrors.teamName = "Team Name is required";
-        if (!formData.leaderName) newErrors.leaderName = "Leader Name is required";
-        if (!formData.leaderContact) newErrors.leaderContact = "Contact is required";
-        if (!formData.leaderEmail) newErrors.leaderEmail = "Email is required";
+
+        if (!formData.teamName.trim()) newErrors.teamName = "Team Name is required";
+        else if (formData.teamName.length < 3) newErrors.teamName = "Team Name must be at least 3 chars";
+
+        if (!formData.leaderName.trim()) newErrors.leaderName = "Leader Name is required";
+
+        if (!formData.leaderContact.trim()) newErrors.leaderContact = "Contact is required";
+        else if (!validatePhone(formData.leaderContact)) newErrors.leaderContact = "Invalid Phone (10 digits required)";
+
+        if (!formData.leaderEmail.trim()) newErrors.leaderEmail = "Email is required";
+        else if (!validateEmail(formData.leaderEmail)) newErrors.leaderEmail = "Invalid Email Address";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -99,22 +117,44 @@ export default function Register() {
 
     const validateStep2 = () => {
         let isValid = true;
-        formData.members.forEach((member) => {
-            if (!member.name || !member.contact || !member.email) {
-                isValid = false;
-            }
-        });
+        // Logic: if a member row exists, it must be valid.
+        // But backend allows gaps? No, the mapped data skips empty rows.
+        // However, the UI forces at least "Member 1".
+        // Let's assume ANY filled field in a row requires ALL fields in that row to be valid.
+        // OR simply strict validation: All displayed member rows must be filled validly.
 
-        if (!isValid) {
-            alert("Please fill in all member details");
-            return false;
+        const newMembers = [...formData.members];
+        let hasErrors = false;
+
+        // We can't easily show per-row errors with the current 'errors' state object structure (flat keys).
+        // For now, we will just use alert for Step 2 errors or simple blocking.
+        // IMPROVEMENT: Ideally we would map errors to `members[i].field`.
+        // Given constraints, I'll stick to 'alert' for Step 2 details or generic valid check.
+        // Wait, I can't set per-field error in the current `Input` component easily for array items without changing state structure.
+        // I will adhere to the request "proper validations" by blocking invalid input and showing an alert.
+
+        for (let i = 0; i < formData.members.length; i++) {
+            const m = formData.members[i];
+            if (!m.name.trim() || !m.contact.trim() || !m.email.trim()) {
+                alert(`Please fill all details for Member ${i + 1}`);
+                return false;
+            }
+            if (!validatePhone(m.contact)) {
+                alert(`Invalid Phone Number for Member ${i + 1} (10 digits required)`);
+                return false;
+            }
+            if (!validateEmail(m.email)) {
+                alert(`Invalid Email Address for Member ${i + 1}`);
+                return false;
+            }
         }
+
         return true;
     };
 
     const validateStep3 = () => {
         const newErrors: { [key: string]: string } = {};
-        if (!formData.collegeName) newErrors.collegeName = "College Name is required";
+        if (!formData.collegeName.trim()) newErrors.collegeName = "College Name is required";
 
         if (parseInt(userCaptcha) !== captcha.answer) {
             setCaptchaError("Incorrect Captcha Answer");
@@ -127,12 +167,62 @@ export default function Register() {
         return Object.keys(newErrors).length === 0 && !newErrors.captcha;
     };
 
-    const handleNext = () => {
+    const handleNext = async () => {
         if (step === 1 && validateStep1()) setStep(2);
         if (step === 2 && validateStep2()) setStep(3);
         if (step === 3 && validateStep3()) {
-            console.log("Submitting:", formData);
-            setStep(4);
+            setIsSubmitting(true);
+            setSubmitError("");
+
+            try {
+                // Construct Payload
+                const payload: any = {
+                    team_name: formData.teamName,
+                    leader: {
+                        name: formData.leaderName,
+                        phone: formData.leaderContact,
+                        email: formData.leaderEmail
+                    },
+                    college_name: formData.collegeName,
+                    // Optional based on backend logic
+                    idea: "Pending", // Backend doc shows 'idea' in request body
+                    gameName: "Pending" // Backend doc shows 'gameName' optional
+                };
+
+                // Map additional members
+                // Backend expects member2, member3 etc.
+                formData.members.forEach((member, index) => {
+                    if (member.name && member.email) { // basic check
+                        payload[`member${index + 2}`] = {
+                            name: member.name,
+                            phone: member.contact,
+                            email: member.email
+                        };
+                    }
+                });
+
+                const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://invento-backend.vercel.app';
+
+                const res = await fetch(`${API_URL}/api/teams/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    setStep(4);
+                } else {
+                    setSubmitError(data.message || "Registration failed. Please try again.");
+                }
+
+            } catch (error) {
+                setSubmitError("Network error. Please try again later.");
+                console.error("Registration Error:", error);
+            } finally {
+                setIsSubmitting(false);
+            }
         }
     };
 
@@ -312,12 +402,19 @@ export default function Register() {
                     </div>
                 )}
 
+                {submitError && (
+                    <div className="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 font-bold text-sm">
+                        {submitError}
+                    </div>
+                )}
+
                 <div className="mt-8 flex gap-4 pt-6 border-t-4 border-black">
                     {step > 1 && (
                         <Button
                             variant="outline"
                             onClick={handleBack}
                             className="w-1/3"
+                            disabled={isSubmitting}
                         >
                             Back
                         </Button>
@@ -326,8 +423,9 @@ export default function Register() {
                         variant="primary"
                         onClick={handleNext}
                         className={step === 1 ? 'w-full' : 'w-full'}
+                        disabled={isSubmitting}
                     >
-                        {step === 3 ? 'Complete Registration' : 'Next Step'}
+                        {isSubmitting ? 'Registering...' : step === 3 ? 'Complete Registration' : 'Next Step'}
                     </Button>
                 </div>
             </Card>
