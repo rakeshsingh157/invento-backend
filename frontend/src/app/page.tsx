@@ -131,38 +131,61 @@ export default function Home() {
               <h2 className="text-5xl md:text-6xl font-black mb-2">Hall of Fame</h2>
               <p className="text-xl font-bold text-gray-500">Last Year's Legends</p>
             </div>
-            <button className="bg-black text-white px-8 py-3 font-bold rounded-full hover:bg-brand-pink transition-colors">
-              View All Projects
-            </button>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="group relative aspect-video bg-gray-100 rounded-xl border-4 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-              <div className="absolute inset-0 bg-brand-pink/20 flex items-center justify-center p-8 text-center group-hover:bg-brand-pink/90 transition-colors">
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                  <h3 className="text-4xl font-black text-white">Team Alpha</h3>
-                  <p className="text-white font-bold text-xl">Best Innovation</p>
+          <div className="grid md:grid-cols-3 gap-10 mt-12 pb-4">
+            {/* 1st Place */}
+            <div className="relative group">
+              <div className="absolute -top-6 -left-4 z-30 bg-yellow-400 border-4 border-black px-4 py-2 font-black text-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -rotate-6 transform group-hover:rotate-0 transition-transform">
+                #1 PLACE
+              </div>
+              <div className="aspect-4/3 bg-gray-100 rounded-xl border-4 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative">
+                <Image
+                  src="/hall-of-fame-1.png"
+                  alt="1st Place Winner"
+                  fill
+                  className="object-cover translate-y-4 scale-110"
+                />
+                <div className="absolute bottom-0 left-0 w-full bg-black py-2 z-20 border-t-4 border-black">
+                  <h3 className="text-white font-black text-center text-lg md:text-xl uppercase tracking-widest">999 Studio</h3>
                 </div>
               </div>
-              <div className="absolute top-4 left-4 bg-yellow-400 border-2 border-black px-3 py-1 font-bold text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">1st Place</div>
             </div>
-            <div className="group relative aspect-video bg-gray-100 rounded-xl border-4 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-              <div className="absolute inset-0 bg-blue-400/20 flex items-center justify-center p-8 text-center group-hover:bg-blue-500/90 transition-colors">
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                  <h3 className="text-4xl font-black text-white">Code Bashers</h3>
-                  <p className="text-white font-bold text-xl">Best Design</p>
+
+            {/* 2nd Place */}
+            <div className="relative group">
+              <div className="absolute -top-6 -left-4 z-30 bg-gray-300 border-4 border-black px-4 py-2 font-black text-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -rotate-2 transform group-hover:rotate-0 transition-transform">
+                #2 PLACE
+              </div>
+              <div className="aspect-4/3 bg-gray-100 rounded-xl border-4 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative">
+                <Image
+                  src="/hall-of-fame-2.jpg"
+                  alt="2nd Place Winner"
+                  fill
+                  className="object-cover translate-y-4 scale-110"
+                />
+                <div className="absolute bottom-0 left-0 w-full bg-black py-2 z-20 border-t-4 border-black">
+                  <h3 className="text-white font-black text-center text-lg md:text-xl uppercase tracking-widest">Tech Titans</h3>
                 </div>
               </div>
-              <div className="absolute top-4 left-4 bg-gray-300 border-2 border-black px-3 py-1 font-bold text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">2nd Place</div>
             </div>
-            <div className="group relative aspect-video bg-gray-100 rounded-xl border-4 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-              <div className="absolute inset-0 bg-green-400/20 flex items-center justify-center p-8 text-center group-hover:bg-green-500/90 transition-colors">
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                  <h3 className="text-4xl font-black text-white">Pixel Punks</h3>
-                  <p className="text-white font-bold text-xl">Best UI/UX</p>
+
+            {/* 3rd Place */}
+            <div className="relative group">
+              <div className="absolute -top-6 -left-4 z-30 bg-orange-400 border-4 border-black px-4 py-2 font-black text-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rotate-3 transform group-hover:rotate-0 transition-transform">
+                #3 PLACE
+              </div>
+              <div className="aspect-4/3 bg-gray-100 rounded-xl border-4 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative">
+                <Image
+                  src="/hall-of-fame-3.jpg"
+                  alt="3rd Place Winner"
+                  fill
+                  className="object-cover translate-y-4 scale-110"
+                />
+                <div className="absolute bottom-0 left-0 w-full bg-black py-2 z-20 border-t-4 border-black">
+                  <h3 className="text-white font-black text-center text-lg md:text-xl uppercase tracking-widest">Game On</h3>
                 </div>
               </div>
-              <div className="absolute top-4 left-4 bg-orange-400 border-2 border-black px-3 py-1 font-bold text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">3rd Place</div>
             </div>
           </div>
         </div>
@@ -196,7 +219,7 @@ export default function Home() {
             <Heart className="w-12 h-12 text-red-500 fill-current" /> Our Sponsors
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            {[1, 2, 3, 4].map((i) => (
               <div key={`sponsor-${i}`} className="aspect-[3/2] bg-white rounded-xl border-4 border-black flex items-center justify-center font-black text-gray-300 text-3xl hover:bg-brand-pink hover:text-white hover:-translate-y-2 transition-all cursor-pointer shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 LOGO
               </div>
@@ -210,7 +233,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
           <div>
             <h2 className="text-3xl font-black mb-2">INVENTO</h2>
-            <p className="text-gray-400 max-w-sm">Built by developers, for developers. <br /> Making the web fun again.</p>
+            <p className="text-gray-400 max-w-sm">Built by Jitesh Patil and Rakesh Singh <br /> Making the web fun again.</p>
           </div>
 
           <div className="flex gap-4">

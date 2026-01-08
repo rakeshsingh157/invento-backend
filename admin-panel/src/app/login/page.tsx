@@ -21,7 +21,7 @@ export default function LoginPage() {
             // Try port 5000 first, then 3000 if needed (or just assume 5000 as per my plan)
             // I'll stick to a hardcoded logic or env var if I could.
             // For now, let's assume valid API is at http://localhost:5000 based on standard Express practices when Next is on 3000.
-            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://invento-backend.vercel.app';
 
             const res = await fetch(`${API_URL}/api/auth/login`, {
                 method: "POST",

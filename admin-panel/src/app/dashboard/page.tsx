@@ -44,7 +44,7 @@ export default function DashboardPage() {
         }
 
         try {
-            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://invento-backend.vercel.app';
             const res = await fetch(`${API_URL}/api/teams`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -253,9 +253,16 @@ export default function DashboardPage() {
                                                 <div className="text-xs text-gray-500">{team.leader.phone}</div>
                                             </td>
                                             <td className="p-4 border-r border-gray-200">
-                                                <div className="flex items-center gap-1">
-                                                    <Users size={14} className="text-gray-400" />
-                                                    <span>{(team.member5 ? 5 : team.member4 ? 4 : team.member3 ? 3 : team.member2 ? 2 : 1)} / 5</span>
+                                                <div className="flex flex-col gap-2">
+                                                    {[team.member2, team.member3, team.member4, team.member5].map((member, idx) => (
+                                                        member && member.name ? (
+                                                            <div key={idx} className="text-xs border-b border-gray-100 last:border-0 pb-1 last:pb-0">
+                                                                <span className="font-bold block">{member.name}</span>
+                                                                <span className="text-gray-500">{member.phone}</span>
+                                                            </div>
+                                                        ) : null
+                                                    ))}
+                                                    {(!team.member2) && <span className="text-gray-400 italic text-xs">No other members</span>}
                                                 </div>
                                             </td>
                                             <td className="p-4 border-r border-gray-200">
@@ -305,17 +312,32 @@ export default function DashboardPage() {
                                             <p className="font-mono text-xs text-gray-600">{team.leader.phone}</p>
                                         </div>
 
-                                        <div className="flex justify-between items-center text-xs font-bold text-gray-500">
+                                        {/* Additional Members for Mobile */}
+                                        {(team.member2 || team.member3 || team.member4 || team.member5) && (
+                                            <div className="bg-white p-2 rounded border border-gray-200">
+                                                <p className="font-bold text-xs uppercase text-gray-400 mb-2">Team Members</p>
+                                                <div className="space-y-2">
+                                                    {[team.member2, team.member3, team.member4, team.member5].map((member, idx) => (
+                                                        member && member.name ? (
+                                                            <div key={idx} className="text-xs border-b border-gray-100 last:border-0 pb-1 last:pb-0 flex justify-between">
+                                                                <span className="font-bold">{member.name}</span>
+                                                                <span className="font-mono text-gray-500">{member.phone}</span>
+                                                            </div>
+                                                        ) : null
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="flex justify-between items-center text-xs font-bold text-gray-500 pt-2 border-t border-gray-100">
                                             <div className="flex items-center gap-1">
                                                 <Users size={14} />
-                                                <span>Members: {(team.member5 ? 5 : team.member4 ? 4 : team.member3 ? 3 : team.member2 ? 2 : 1)}</span>
+                                                <span>Total: {(team.member5 ? 5 : team.member4 ? 4 : team.member3 ? 3 : team.member2 ? 2 : 1)}</span>
                                             </div>
                                             <div className="font-mono">
                                                 {new Date(team.registeredAt).toLocaleDateString()}
                                             </div>
                                         </div>
-
-                                        {/* Collapsible details could go here, but for now simple view is better */}
                                     </div>
                                 </motion.div>
                             )) : (
