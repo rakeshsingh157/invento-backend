@@ -76,14 +76,14 @@ export default function Home() {
 
             <p className="text-xl md:text-2xl font-bold max-w-lg text-black bg-white/50 backdrop-blur-sm p-4 rounded-xl border-2 border-black/10 mt-12">
               Unlimited coffee, code, and chaos. <br />
-              <span className="text-brand-pink bg-black px-2 mt-1 inline-block transform -rotate-1 text-white">Join the 48-hour challenge.</span>
+              <span className="text-brand-pink bg-black px-2 mt-1 inline-block transform -rotate-1 text-white">Join the Invento Gamathon.</span>
             </p>
 
             <div className="flex flex-wrap gap-4 pt-4">
               <button
                 onClick={handleHeroRegister}
                 disabled={isHeroRegisterLoading}
-                className="bg-brand-yellow text-black text-xl font-black px-10 py-5 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center gap-3 transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none bg-white"
+                className="bg-brand-yellow text-black text-xl font-black px-10 py-5 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center gap-3 transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
               >
                 {isHeroRegisterLoading && <Loader2 className="w-6 h-6 animate-spin" />}
                 Register Now {!isHeroRegisterLoading && <MoveRight className="w-6 h-6" />}

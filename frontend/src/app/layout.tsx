@@ -17,7 +17,7 @@ const fjalla = Fjalla_One({
 
 export const metadata: Metadata = {
   title: "Invento | The Ultimate Design Hackathon",
-  description: "Join the ultimate 48-hour creative showdown.",
+  description: "Join the ultimate Invento Gamathon.",
 };
 
 export default function RootLayout({
