@@ -72,25 +72,79 @@ export default function Register() {
         }
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const compressImage = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target?.result as string;
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Resize if dimension is too large (e.g., > 1200px) to help compression
+                    const MAX_DIM = 1200;
+                    if (width > height) {
+                        if (width > MAX_DIM) {
+                            height *= MAX_DIM / width;
+                            width = MAX_DIM;
+                        }
+                    } else {
+                        if (height > MAX_DIM) {
+                            width *= MAX_DIM / height;
+                            height = MAX_DIM;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext("2d");
+                    ctx?.drawImage(img, 0, 0, width, height);
+
+                    // Iterative compression to get below 200KB
+                    let quality = 0.9;
+                    let dataUrl = canvas.toDataURL("image/jpeg", quality);
+
+                    while (dataUrl.length > 200 * 1024 && quality > 0.1) {
+                        quality -= 0.1;
+                        dataUrl = canvas.toDataURL("image/jpeg", quality);
+                    }
+
+                    resolve(dataUrl);
+                };
+                img.onerror = (err) => reject(err);
+            };
+            reader.onerror = (err) => reject(err);
+        });
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            if (file.size > 5 * 1024 * 1024) { // 5MB
-                alert("File size too large (max 5MB)");
+            // Check original file type
+            if (!file.type.startsWith("image/")) {
+                alert("Please upload an image file.");
                 return;
             }
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setFormData(prev => ({ ...prev, screenShot: reader.result as string }));
+
+            try {
+                const compressedDataUrl = await compressImage(file);
+
+                setFormData(prev => ({ ...prev, screenShot: compressedDataUrl }));
                 if (errors.screenShot) {
-                    setErrors((prev) => {
+                    setErrors(prev => {
                         const newErrors = { ...prev };
                         delete newErrors.screenShot;
                         return newErrors;
                     });
                 }
-            };
-            reader.readAsDataURL(file);
+            } catch (error) {
+                console.error("Compression error:", error);
+                alert("Failed to process image. Please try another one.");
+            }
         }
     };
 
@@ -526,7 +580,7 @@ export default function Register() {
                             <div className="flex flex-col items-center justify-center mb-6">
                                 <div className="w-48 h-48 bg-gray-200 border-4 border-black flex items-center justify-center mb-2 relative">
                                     {/* Placeholder for QR Code */}
-                                    <img src="/assets/payment-qr.png" alt="Payment QR Code" className="w-full h-full object-cover" />
+                                    <img src="/sahyog-qr.png" alt="Payment QR Code" className="w-full h-full object-cover" />
                                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-50">
                                         <span className="bg-white px-2 text-xs font-bold">QR CODE</span>
                                     </div>

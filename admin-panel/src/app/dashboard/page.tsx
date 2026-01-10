@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Download, LogOut, Users, Search, RefreshCw, Trash2 } from "lucide-react";
+import { Download, LogOut, Users, Search, RefreshCw, Trash2, Eye } from "lucide-react";
 
 interface Member {
     name: string;
@@ -96,8 +96,7 @@ export default function DashboardPage() {
             "Member 2 Name", "Member 2 Email", "Member 2 Phone", "Member 2 Year", "Member 2 Class",
             "Member 3 Name", "Member 3 Email", "Member 3 Phone", "Member 3 Year", "Member 3 Class",
             "Member 4 Name", "Member 4 Email", "Member 4 Phone", "Member 4 Year", "Member 4 Class",
-            "Member 5 Name", "Member 5 Email", "Member 5 Phone", "Member 5 Year", "Member 5 Class",
-            "Payment Screenshot"
+            "Member 5 Name", "Member 5 Email", "Member 5 Phone", "Member 5 Year", "Member 5 Class"
         ];
 
         const csvRows = [headers.join(",")];
@@ -121,10 +120,7 @@ export default function DashboardPage() {
                 `"${team.member2?.name || ""}"`, `"${team.member2?.email || ""}"`, `"${team.member2?.phone || ""}"`, `"${team.member2?.year || ""}"`, `"${team.member2?.class || ""}"`,
                 `"${team.member3?.name || ""}"`, `"${team.member3?.email || ""}"`, `"${team.member3?.phone || ""}"`, `"${team.member3?.year || ""}"`, `"${team.member3?.class || ""}"`,
                 `"${team.member4?.name || ""}"`, `"${team.member4?.email || ""}"`, `"${team.member4?.phone || ""}"`, `"${team.member4?.year || ""}"`, `"${team.member4?.class || ""}"`,
-                `"${team.member5?.name || ""}"`, `"${team.member5?.email || ""}"`, `"${team.member5?.phone || ""}"`, `"${team.member5?.year || ""}"`, `"${team.member5?.class || ""}"`,
-
-                // Payment
-                `"${team.screenShot ? "Yes" : "No"}"`
+                `"${team.member5?.name || ""}"`, `"${team.member5?.email || ""}"`, `"${team.member5?.phone || ""}"`, `"${team.member5?.year || ""}"`, `"${team.member5?.class || ""}"`
             ];
             csvRows.push(row.join(","));
         });
@@ -144,12 +140,41 @@ export default function DashboardPage() {
         team.leader.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Function to open screenshot in new tab
-    const viewScreenshot = (screenShot: string) => {
-        const win = window.open();
-        if (win) {
-            win.document.write(`<img src="${screenShot}" style="max-width:100%; height:auto;" />`);
-            win.document.title = "Payment Receipt";
+    // Function to fetch and open screenshot in new tab
+    const handleViewScreenshot = async (teamId: string, teamName: string) => {
+        const token = localStorage.getItem("adminToken");
+        if (!token) {
+            alert("Please login to view screenshots");
+            return;
+        }
+
+        try {
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://invento-backend.vercel.app';
+            const res = await fetch(`${API_URL}/api/teams/${teamId}/screenshot`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const data = await res.json();
+
+            if (data.success && data.data && data.data.screenShot) {
+                const win = window.open();
+                if (win) {
+                    win.document.write(`
+                        <html>
+                            <head><title>Payment Receipt - ${teamName}</title></head>
+                            <body style="margin:0; display:flex; justify-content:center; align-items:center; background:#f0f0f0; min-height:100vh;">
+                                <img src="${data.data.screenShot}" style="max-width:90%; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid #000;" />
+                            </body>
+                        </html>
+                    `);
+                }
+            } else {
+                alert("No payment screenshot found for this team.");
+            }
+        } catch (error) {
+            console.error("Error fetching screenshot:", error);
+            alert("Failed to fetch screenshot.");
         }
     };
 
@@ -223,7 +248,7 @@ export default function DashboardPage() {
                                 onClick={exportToCSV}
                                 className="flex-1 sm:flex-none px-6 py-2 border-2 border-black bg-brand-yellow hover:bg-yellow-400 font-bold flex items-center justify-center gap-2 transition-colors box-shadow-card active:translate-y-1 active:shadow-none"
                             >
-                                <Download size={18} /> <span className="sm:hidden lg:inline">Export</span><span className="hidden sm:inline lg:hidden">CSV</span>
+                                <Download size={18} /> <span className="sm:hidden lg:inline">Export CSV</span>
                             </button>
                         </div>
                     </div>
@@ -300,16 +325,12 @@ export default function DashboardPage() {
                                                 </div>
                                             </td>
                                             <td className="p-4 border-r border-gray-200 text-center">
-                                                {team.screenShot ? (
-                                                    <button
-                                                        onClick={() => viewScreenshot(team.screenShot!)}
-                                                        className="text-xs bg-green-100 text-green-700 border border-green-500 px-2 py-1 rounded font-bold hover:bg-green-200"
-                                                    >
-                                                        View Receipt
-                                                    </button>
-                                                ) : (
-                                                    <span className="text-gray-400 text-xs italic">No Receipt</span>
-                                                )}
+                                                <button
+                                                    onClick={() => handleViewScreenshot(team._id, team.team_name)}
+                                                    className="text-xs bg-blue-100 text-blue-700 border border-blue-500 px-2 py-1 rounded font-bold hover:bg-blue-200 flex items-center justify-center gap-1 mx-auto"
+                                                >
+                                                    <Eye size={12} /> Check Receipt
+                                                </button>
                                             </td>
                                             <td className="p-4">
                                                 <span className={`inline-block px-2 py-1 rounded-full text-xs font-bold border border-black ${team.status === 'registered' ? 'bg-green-100 text-green-800' : 'bg-gray-100'}`}>
@@ -351,14 +372,12 @@ export default function DashboardPage() {
                                             <span className={`px-2 py-1 rounded-full text-[10px] font-bold border border-black uppercase ${team.status === 'registered' ? 'bg-green-100 text-green-800' : 'bg-gray-100'}`}>
                                                 {team.status}
                                             </span>
-                                            {team.screenShot && (
-                                                <button
-                                                    onClick={() => viewScreenshot(team.screenShot!)}
-                                                    className="text-[10px] text-blue-600 font-bold underline"
-                                                >
-                                                    View Receipt
-                                                </button>
-                                            )}
+                                            <button
+                                                onClick={() => handleViewScreenshot(team._id, team.team_name)}
+                                                className="text-[10px] text-blue-600 font-bold underline"
+                                            >
+                                                Check Receipt
+                                            </button>
                                         </div>
                                     </div>
 
