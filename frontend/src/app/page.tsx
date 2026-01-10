@@ -38,7 +38,7 @@ export default function Home() {
           >
             <h1 className="text-7xl md:text-9xl font-black text-white leading-[0.9] tracking-tighter drop-shadow-xl">
               super<br />
-              <span className="text-brand-yellow text-shadow-retro">invent</span>
+              <span className="text-brand-yellow text-shadow-retro">invento</span>
             </h1>
             <p className="text-2xl md:text-3xl font-bold bg-black text-white inline-block px-4 py-2 transform -rotate-1 rounded-sm shadow-xl">
               A hackathon....kinda
@@ -101,8 +101,8 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { title: "Register", icon: Zap, desc: "Sign up your team of 2-4 members. Choose a cool name.", color: "bg-pink-300" },
-              { title: "Build", icon: Send, desc: "48 hours of non-stop coding. Turn coffee into code.", color: "bg-purple-300" },
+              { title: "Register", icon: Zap, desc: "Sign up your team of 2-5 members. Choose a cool name.", color: "bg-pink-300" },
+              { title: "Build", icon: Send, desc: "Develop your Android game from home and present it during the Gamathon exhibition.", color: "bg-purple-300" },
               { title: "Submit", icon: Eye, desc: "Demo your project to the judges. Win glory and prizes.", color: "bg-green-300" }
             ].map((item) => (
               <motion.div
@@ -197,14 +197,31 @@ export default function Home() {
           <h2 className="text-4xl md:text-5xl font-black mb-12 flex items-center gap-4">
             <Users className="w-12 h-12" /> Mentorship
           </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[1, 2, 3].map((i) => (
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {[
+              {
+                name: "Gaurav Ravasa",
+                role: "Vice President at JPMorgan Chase",
+                image: "/mentors/gaurav.jpg",
+              },
+              {
+                name: "Pradnya Nehete",
+                role: "IT Coordinator",
+                image: "/mentors/pradnya.jpg",
+              }
+            ].map((mentor, i) => (
               <div key={`mentor-${i}`} className="flex flex-col gap-4 bg-white p-6 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-pointer">
-                <div className="w-20 h-20 bg-gray-200 rounded-full border-4 border-black"></div>
+                <div className="w-24 h-24 bg-gray-200 rounded-full border-4 border-black overflow-hidden relative">
+                  <Image
+                    src={mentor.image}
+                    alt={mentor.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
                 <div>
-                  <h4 className="font-black text-2xl mb-1">Mentor Name {i}</h4>
-                  <p className="text-md font-bold text-brand-pink uppercase tracking-wider">Tech Lead @ Google</p>
-                  <p className="text-sm font-medium text-gray-600 mt-2">Expert guidance on tech stack, scalable architecture, and game design principles.</p>
+                  <h4 className="font-black text-2xl mb-1">{mentor.name}</h4>
+                  <p className="text-sm font-bold text-brand-pink uppercase tracking-wider">{mentor.role}</p>
                 </div>
               </div>
             ))}
@@ -221,7 +238,7 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
               <div key={`sponsor-${i}`} className="aspect-[3/2] bg-white rounded-xl border-4 border-black flex items-center justify-center font-black text-gray-300 text-3xl hover:bg-brand-pink hover:text-white hover:-translate-y-2 transition-all cursor-pointer shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                LOGO
+                Coming soon
               </div>
             ))}
           </div>
