@@ -131,8 +131,7 @@ export default function Home() {
               transition={{ duration: 5, repeat: Infinity }}
               className="absolute top-10 right-0 md:-right-10 bg-brand-orange border-4 border-black p-4 rounded-full shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] z-20 flex flex-col items-center justify-center w-24 h-24 md:w-32 md:h-32 transform rotate-12"
             >
-              <span className="font-black text-2xl md:text-4xl">48</span>
-              <span className="font-bold text-xs uppercase leading-none">Hours</span>
+              <span className="font-black text-2xl md:text-4xl">&lt;/&gt;</span>
             </motion.div>
           </motion.div>
         </div>
@@ -140,7 +139,7 @@ export default function Home() {
         {/* Marquee Ticker */}
         <div className="bg-black text-brand-yellow overflow-hidden py-3 border-y-4 border-black mt-auto relative z-20">
           <div className="whitespace-nowrap animate-marquee flex gap-8">
-            {Array(10).fill("REGISTER NOW • CODEBUG HACKATHON • WIN PRIZES • ").map((text, i) => (
+            {Array(10).fill("REGISTER NOW • Invento Gamathon • WIN PRIZES • ").map((text, i) => (
               <span key={i} className="text-xl md:text-2xl font-black tracking-wider uppercase">{text}</span>
             ))}
           </div>

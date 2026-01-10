@@ -16,7 +16,7 @@ const fjalla = Fjalla_One({
 });
 
 export const metadata: Metadata = {
-  title: "Invento | The Ultimate Design Hackathon",
+  title: "Invento | The Ultimate Design Gamathon",
   description: "Join the ultimate Invento Gamathon.",
 };
 
