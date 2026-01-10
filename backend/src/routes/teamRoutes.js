@@ -7,7 +7,8 @@ const {
   getTeamByName,
   updateTeam,
   deleteTeam,
-  getTeamStats
+  getTeamStats,
+  getTeamScreenshot
 } = require('../controllers/teamController');
 const { protect } = require('../middlewares/authMiddleware');
 
@@ -18,6 +19,7 @@ router.post('/register', registerTeam);
 router.get('/', protect, getAllTeams);
 router.get('/stats', protect, getTeamStats);
 router.get('/name/:teamName', protect, getTeamByName);
+router.get('/:id/screenshot', protect, getTeamScreenshot);
 router.get('/:id', protect, getTeamById);
 router.put('/:id', protect, updateTeam);
 router.delete('/:id', protect, deleteTeam);

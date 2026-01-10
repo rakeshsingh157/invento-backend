@@ -17,27 +17,38 @@ Public API endpoint for team registration with automatic email notifications to 
   "team_name": "Code Warriors",
   "idea": "AI-powered inventory management system",  // optional
   "gameName": "Space Explorer",  // optional
+  "screenShot": "",  // base64 text, optional
   "leader": {
+    "year": "first",
+    "class": "BSC",
     "name": "John Doe",
     "phone": "1234567890",
     "email": "john@example.com"
   },
-  "member2": {
+  "member2": {  // optional
+    "year": "first",
+    "class": "IT",
     "name": "Jane Smith",
     "phone": "2345678901",
     "email": "jane@example.com"
   },
-  "member3": {
+  "member3": {  // optional
+    "year": "first",
+    "class": "SY-IT",
     "name": "Bob Johnson",
     "phone": "3456789012",
     "email": "bob@example.com"
   },
-  "member4": {
+  "member4": {  // optional
+    "year": "first",
+    "class": "SY-IT",
     "name": "Alice Brown",
     "phone": "4567890123",
     "email": "alice@example.com"
   },
-  "member5": {
+  "member5": {  // optional
+    "year": "first",
+    "class": "SY-IT",
     "name": "Charlie Davis",
     "phone": "5678901234",
     "email": "charlie@example.com"
@@ -48,15 +59,20 @@ Public API endpoint for team registration with automatic email notifications to 
 
 #### Required Fields
 - `team_name` - Team name (must be unique)
+- `leader.year` - Leader's academic year (e.g., "first", "second", "third", "fourth")
+- `leader.class` - Leader's class/course (e.g., "BSC", "IT", "SY-IT")
 - `leader.name` - Leader's full name
 - `leader.email` - Leader's email (must be valid and unique)
 - `leader.phone` - Leader's phone number
+- `college_name` - College/Institution name
+
+**Note:** You can register with just the leader (1 member) or add up to 4 additional members (5 members total).
 
 #### Optional Fields
-- `idea` - Team's project idea or description (optional)
-- `gameName` - Game name if participating in game development category (optional)
-- `member2`, `member3`, `member4`, `member5` - Additional team members (optional)
-- `college_name` - College/Institution name (optional)
+- `idea` - Team's project idea or description
+- `gameName` - Game name if participating in game development category
+- `screenShot` - Screenshot in base64 text format
+- `member2`, `member3`, `member4`, `member5` - Additional team members (each with year, class, name, phone, email fields)
 
 #### Success Response (201 Created)
 
@@ -69,26 +85,36 @@ Public API endpoint for team registration with automatic email notifications to 
       "_id": "507f1f77bcf86cd799439011",
       "team_name": "Code Warriors",
       "leader": {
+        "year": "first",
+        "class": "BSC",
         "name": "John Doe",
         "email": "john@example.com",
         "phone": "1234567890"
       },
       "member2": {
+        "year": "first",
+        "class": "IT",
         "name": "Jane Smith",
         "email": "jane@example.com",
         "phone": "2345678901"
       },
       "member3": {
+        "year": "first",
+        "class": "SY-IT",
         "name": "Bob Johnson",
         "email": "bob@example.com",
         "phone": "3456789012"
       },
       "member4": {
+        "year": "first",
+        "class": "SY-IT",
         "name": "Alice Brown",
         "email": "alice@example.com",
         "phone": "4567890123"
       },
       "member5": {
+        "year": "first",
+        "class": "SY-IT",
         "name": "Charlie Davis",
         "email": "charlie@example.com",
         "phone": "5678901234"
@@ -96,6 +122,7 @@ Public API endpoint for team registration with automatic email notifications to 
       "college_name": "XYZ College of Engineering",
       "idea": "AI-powered inventory management system",
       "gameName": "Space Explorer",
+      "screenShot": "",
       "registeredAt": "2026-01-06T10:30:00.000Z",
       "status": "registered"
     },
@@ -173,10 +200,28 @@ All admin endpoints require JWT authentication token in the Authorization header
 ### Get All Teams
 - **GET** `/api/teams`
 - **Headers:** `Authorization: Bearer <token>`
+- **Note:** Response excludes screenshot field for faster performance
 
 ### Get Team by ID
 - **GET** `/api/teams/:id`
 - **Headers:** `Authorization: Bearer <token>`
+- **Note:** Includes all team data including screenshot
+
+### Get Team Screenshot
+- **GET** `/api/teams/:id/screenshot`
+- **Headers:** `Authorization: Bearer <token>`
+- **Description:** Get only the screenshot for a specific team (optimized for fast access)
+
+**Success Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "team_name": "Code Warriors",
+    "screenShot": "base64_encoded_image_data"
+  }
+}
+```
 
 ### Get Team by Name
 - **GET** `/api/teams/name/:teamName`
@@ -282,9 +327,9 @@ const registerTeam = async (teamData) => {
 
 ## Notes
 
+- **Team Size:** Minimum 1 member (leader only), Maximum 5 members (leader + 4 additional members)
+- **Solo Registration:** Teams can register with just the leader - other members are optional
 - Team name must be unique
 - Email addresses must be unique across all teams
-- Minimum 1 member (leader) required
-- Maximum 5 members per team
-- Email notifications sent asynchronously
+- Email notifications sent asynchronously to all registered members
 - If email sending fails, team is still registered with a warning message
