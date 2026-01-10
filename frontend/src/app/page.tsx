@@ -28,65 +28,113 @@ export default function Home() {
       <Navbar />
 
       {/* HERO SECTION */}
-      <section className="relative bg-brand-pink min-h-[90vh] flex flex-col justify-center overflow-hidden pb-20">
-        <div className="container mx-auto px-6 md:px-12 grid md:grid-cols-2 gap-12 items-center relative z-10">
+      {/* HERO SECTION */}
+      <section className="relative bg-brand-pink min-h-[95vh] flex flex-col pt-10 overflow-hidden">
+
+        {/* Architectural Grid Background */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[linear-gradient(to_right,#000_1px,transparent_1px),linear-gradient(to_bottom,#000_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
+
+        <div className="container mx-auto px-6 md:px-12 flex-grow grid md:grid-cols-12 gap-8 items-center relative z-10">
+
+          {/* Left Content (Text) */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="space-y-6"
+            className="md:col-span-7 flex flex-col justify-center space-y-8"
           >
-            <h1 className="text-7xl md:text-9xl font-black text-white leading-[0.9] tracking-tighter drop-shadow-xl">
-              super<br />
-              <span className="text-brand-yellow text-shadow-retro">invento</span>
+            {/* Badge */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.5, type: "spring" }}
+              className="self-start bg-brand-yellow border-4 border-black px-6 py-2 rounded-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transform -rotate-2"
+            >
+              <span className="font-black text-xs md:text-sm tracking-widest uppercase">The Ultimate Showdown</span>
+            </motion.div>
+
+            <h1 className="text-7xl md:text-9xl font-black text-white leading-[0.85] tracking-tighter drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+              Invento<br />
+              <span className="text-brand-yellow text-shadow-retro relative inline-block mb-2">
+                2.0
+                <svg className="absolute -bottom-6 left-0 w-full h-6 text-black" viewBox="0 0 200 9" preserveAspectRatio="none">
+                  <path d="M2.00025 6.99997C2.00025 6.99997 39.5892 2.5 73.5422 2.5C141.448 2.5 198.003 7 198.003 7" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                </svg>
+              </span>
             </h1>
-            <p className="text-2xl md:text-3xl font-bold bg-black text-white inline-block px-4 py-2 transform -rotate-1 rounded-sm shadow-xl">
-              A hackathon....kinda
+
+            <p className="text-xl md:text-2xl font-bold max-w-lg text-black bg-white/50 backdrop-blur-sm p-4 rounded-xl border-2 border-black/10 mt-12">
+              Unlimited coffee, code, and chaos. <br />
+              <span className="text-brand-pink bg-black px-2 mt-1 inline-block transform -rotate-1 text-white">Join the 48-hour challenge.</span>
             </p>
-            <p className="text-lg md:text-xl font-medium max-w-md">
-              Unlimited coffee, code, and chaos. Join the ultimate developer showdown alongside mentors and sponsors.
-            </p>
-            <Link href="/register">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="mt-4 bg-brand-orange text-black text-xl font-black px-10 py-5 rounded-md box-shadow-retro flex items-center gap-3 hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all border-4 border-black"
-              >
-                Register Now <MoveRight className="w-6 h-6" />
-              </motion.button>
-            </Link>
+
+            <div className="flex flex-wrap gap-4 pt-4">
+              <Link href="/register">
+                <motion.button
+                  whileHover={{ scale: 1.05, boxShadow: "0px 0px 0px 0px #000", translate: "4px 4px" }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-brand-yellow text-black text-xl font-black px-10 py-5 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center gap-3 transition-all"
+                >
+                  Register Now <MoveRight className="w-6 h-6" />
+                </motion.button>
+              </Link>
+              <Link href="#guidelines">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-white text-black text-xl font-black px-8 py-5 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all"
+                >
+                  Learn More
+                </motion.button>
+              </Link>
+            </div>
           </motion.div>
 
+          {/* Right Content (Image) */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8, rotate: 10 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative h-[400px] md:h-[600px] flex items-center justify-center p-10"
+            className="md:col-span-5 relative flex items-center justify-center"
           >
-            {/* Robot Image */}
-            <div className="relative w-full h-full">
+
+
+            {/* Robot */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative z-10 w-full h-[400px] md:h-[600px] flex items-center justify-center border-none"
+            >
               <Image
                 src="/hero-robot.png"
-                alt="Robot Mascot"
+                alt="Invento Robot"
                 fill
                 className="object-contain drop-shadow-2xl"
                 priority
               />
-            </div>
+            </motion.div>
 
-            {/* Floating elements */}
+            {/* Floating Badge */}
             <motion.div
-              animate={{ y: [0, -20, 0] }}
-              transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-              className="absolute top-10 right-10 bg-white border-4 border-black p-4 rounded-full shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+              animate={{ rotate: [0, 10, 0] }}
+              transition={{ duration: 5, repeat: Infinity }}
+              className="absolute top-10 right-0 md:-right-10 bg-brand-orange border-4 border-black p-4 rounded-full shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] z-20 flex flex-col items-center justify-center w-24 h-24 md:w-32 md:h-32 transform rotate-12"
             >
-              <Zap className="w-8 h-8 text-brand-yellow fill-current" />
+              <span className="font-black text-2xl md:text-4xl">48</span>
+              <span className="font-bold text-xs uppercase leading-none">Hours</span>
             </motion.div>
           </motion.div>
         </div>
 
-        {/* Background Patterns */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        {/* Marquee Ticker */}
+        <div className="bg-black text-brand-yellow overflow-hidden py-3 border-y-4 border-black mt-auto relative z-20">
+          <div className="whitespace-nowrap animate-marquee flex gap-8">
+            {Array(10).fill("REGISTER NOW • CODEBUG HACKATHON • WIN PRIZES • ").map((text, i) => (
+              <span key={i} className="text-xl md:text-2xl font-black tracking-wider uppercase">{text}</span>
+            ))}
+          </div>
+        </div>
       </section>
 
       <WavySeparator color="#FACC15" />
