@@ -12,15 +12,21 @@ interface TeamMember {
     name: string;
     contact: string;
     email: string;
+    year: string;
+    class: string;
 }
 
 interface FormData {
     teamName: string;
+    gameName: string;
     leaderName: string;
     leaderContact: string;
     leaderEmail: string;
+    leaderYear: string;
+    leaderClass: string;
     members: TeamMember[];
     collegeName: string;
+    screenShot: string;
 }
 
 export default function Register() {
@@ -28,11 +34,15 @@ export default function Register() {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState<FormData>({
         teamName: "",
+        gameName: "",
         leaderName: "",
         leaderContact: "",
         leaderEmail: "",
-        members: [{ name: "", contact: "", email: "" }],
+        leaderYear: "",
+        leaderClass: "",
+        members: [{ name: "", contact: "", email: "", year: "", class: "" }],
         collegeName: "",
+        screenShot: "",
     });
 
     // Captcha State
@@ -49,7 +59,7 @@ export default function Register() {
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
         // Clear error when typing
@@ -62,7 +72,83 @@ export default function Register() {
         }
     };
 
-    const handleMemberChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const compressImage = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target?.result as string;
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Resize if dimension is too large (e.g., > 1200px) to help compression
+                    const MAX_DIM = 1200;
+                    if (width > height) {
+                        if (width > MAX_DIM) {
+                            height *= MAX_DIM / width;
+                            width = MAX_DIM;
+                        }
+                    } else {
+                        if (height > MAX_DIM) {
+                            width *= MAX_DIM / height;
+                            height = MAX_DIM;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext("2d");
+                    ctx?.drawImage(img, 0, 0, width, height);
+
+                    // Iterative compression to get below 200KB
+                    let quality = 0.9;
+                    let dataUrl = canvas.toDataURL("image/jpeg", quality);
+
+                    while (dataUrl.length > 200 * 1024 && quality > 0.1) {
+                        quality -= 0.1;
+                        dataUrl = canvas.toDataURL("image/jpeg", quality);
+                    }
+
+                    resolve(dataUrl);
+                };
+                img.onerror = (err) => reject(err);
+            };
+            reader.onerror = (err) => reject(err);
+        });
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Check original file type
+            if (!file.type.startsWith("image/")) {
+                alert("Please upload an image file.");
+                return;
+            }
+
+            try {
+                const compressedDataUrl = await compressImage(file);
+
+                setFormData(prev => ({ ...prev, screenShot: compressedDataUrl }));
+                if (errors.screenShot) {
+                    setErrors(prev => {
+                        const newErrors = { ...prev };
+                        delete newErrors.screenShot;
+                        return newErrors;
+                    });
+                }
+            } catch (error) {
+                console.error("Compression error:", error);
+                alert("Failed to process image. Please try another one.");
+            }
+        }
+    };
+
+    const handleMemberChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         const newMembers = [...formData.members];
         // @ts-ignore
@@ -74,7 +160,7 @@ export default function Register() {
         if (formData.members.length < 4) {
             setFormData((prev) => ({
                 ...prev,
-                members: [...prev.members, { name: "", contact: "", email: "" }],
+                members: [...prev.members, { name: "", contact: "", email: "", year: "", class: "" }],
             }));
         }
     };
@@ -103,7 +189,11 @@ export default function Register() {
         if (!formData.teamName.trim()) newErrors.teamName = "Team Name is required";
         else if (formData.teamName.length < 3) newErrors.teamName = "Team Name must be at least 3 chars";
 
+        if (!formData.gameName.trim()) newErrors.gameName = "Game Name is required";
+
         if (!formData.leaderName.trim()) newErrors.leaderName = "Leader Name is required";
+        if (!formData.leaderYear.trim()) newErrors.leaderYear = "Year is required";
+        if (!formData.leaderClass.trim()) newErrors.leaderClass = "Class is required";
 
         if (!formData.leaderContact.trim()) newErrors.leaderContact = "Contact is required";
         else if (!validatePhone(formData.leaderContact)) newErrors.leaderContact = "Invalid Phone (10 digits required)";
@@ -118,25 +208,11 @@ export default function Register() {
     const validateStep2 = () => {
         let isValid = true;
         // Logic: if a member row exists, it must be valid.
-        // But backend allows gaps? No, the mapped data skips empty rows.
-        // However, the UI forces at least "Member 1".
-        // Let's assume ANY filled field in a row requires ALL fields in that row to be valid.
-        // OR simply strict validation: All displayed member rows must be filled validly.
-
-        const newMembers = [...formData.members];
-        let hasErrors = false;
-
-        // We can't easily show per-row errors with the current 'errors' state object structure (flat keys).
-        // For now, we will just use alert for Step 2 errors or simple blocking.
-        // IMPROVEMENT: Ideally we would map errors to `members[i].field`.
-        // Given constraints, I'll stick to 'alert' for Step 2 details or generic valid check.
-        // Wait, I can't set per-field error in the current `Input` component easily for array items without changing state structure.
-        // I will adhere to the request "proper validations" by blocking invalid input and showing an alert.
 
         for (let i = 0; i < formData.members.length; i++) {
             const m = formData.members[i];
-            if (!m.name.trim() || !m.contact.trim() || !m.email.trim()) {
-                alert(`Please fill all details for Member ${i + 1}`);
+            if (!m.name.trim() || !m.contact.trim() || !m.email.trim() || !m.year.trim() || !m.class.trim()) {
+                alert(`Please fill all details (Name, Contact, Email, Year, Class) for Member ${i + 1}`);
                 return false;
             }
             if (!validatePhone(m.contact)) {
@@ -155,6 +231,7 @@ export default function Register() {
     const validateStep3 = () => {
         const newErrors: { [key: string]: string } = {};
         if (!formData.collegeName.trim()) newErrors.collegeName = "College Name is required";
+        if (!formData.screenShot) newErrors.screenShot = "Payment Screenshot is required";
 
         if (parseInt(userCaptcha) !== captcha.answer) {
             setCaptchaError("Incorrect Captcha Answer");
@@ -178,25 +255,28 @@ export default function Register() {
                 // Construct Payload
                 const payload: any = {
                     team_name: formData.teamName,
+                    gameName: formData.gameName,
                     leader: {
                         name: formData.leaderName,
                         phone: formData.leaderContact,
-                        email: formData.leaderEmail
+                        email: formData.leaderEmail,
+                        year: formData.leaderYear,
+                        class: formData.leaderClass
                     },
                     college_name: formData.collegeName,
-                    // Optional based on backend logic
-                    idea: "Pending", // Backend doc shows 'idea' in request body
-                    gameName: "Pending" // Backend doc shows 'gameName' optional
+                    screenShot: formData.screenShot,
+                    idea: "Pending", // Default value
                 };
 
                 // Map additional members
-                // Backend expects member2, member3 etc.
                 formData.members.forEach((member, index) => {
-                    if (member.name && member.email) { // basic check
+                    if (member.name && member.email) {
                         payload[`member${index + 2}`] = {
                             name: member.name,
                             phone: member.contact,
-                            email: member.email
+                            email: member.email,
+                            year: member.year,
+                            class: member.class
                         };
                     }
                 });
@@ -285,14 +365,25 @@ export default function Register() {
 
                 {step === 1 && (
                     <div className="space-y-4 animate-in slide-in-from-right duration-300">
-                        <Input
-                            label="Studio / Team Name"
-                            name="teamName"
-                            placeholder="e.g. Pixel Pioneers"
-                            value={formData.teamName}
-                            onChange={handleChange}
-                            error={errors.teamName}
-                        />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Input
+                                label="Studio / Team Name"
+                                name="teamName"
+                                placeholder="e.g. Pixel Pioneers"
+                                value={formData.teamName}
+                                onChange={handleChange}
+                                error={errors.teamName}
+                            />
+                            <Input
+                                label="Game Name"
+                                name="gameName"
+                                placeholder="e.g. Space Invaders"
+                                value={formData.gameName}
+                                onChange={handleChange}
+                                error={errors.gameName}
+                            />
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Input
                                 label="Leader Name"
@@ -311,6 +402,45 @@ export default function Register() {
                                 error={errors.leaderContact}
                             />
                         </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="w-full mb-4">
+                                <label className="block text-sm font-bold text-black mb-1 ml-1 uppercase tracking-wide">
+                                    Leader Year
+                                </label>
+                                <select
+                                    name="leaderYear"
+                                    value={formData.leaderYear}
+                                    onChange={handleChange}
+                                    className={`w-full px-4 py-3 bg-white border-2 border-black rounded-lg text-black focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all appearance-none cursor-pointer ${errors.leaderYear ? 'border-red-500' : ''}`}
+                                >
+                                    <option value="" disabled>Select Year</option>
+                                    <option value="First Year">First Year</option>
+                                    <option value="Second Year">Second Year</option>
+                                    <option value="Third Year">Third Year</option>
+                                </select>
+                                {errors.leaderYear && <p className="mt-1 text-xs text-red-600 font-bold ml-1">{errors.leaderYear}</p>}
+                            </div>
+
+                            <div className="w-full mb-4">
+                                <label className="block text-sm font-bold text-black mb-1 ml-1 uppercase tracking-wide">
+                                    Leader Class / Division
+                                </label>
+                                <select
+                                    name="leaderClass"
+                                    value={formData.leaderClass}
+                                    onChange={handleChange}
+                                    className={`w-full px-4 py-3 bg-white border-2 border-black rounded-lg text-black focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all appearance-none cursor-pointer ${errors.leaderClass ? 'border-red-500' : ''}`}
+                                >
+                                    <option value="" disabled>Select Class</option>
+                                    <option value="BSC IT">BSC IT</option>
+                                    <option value="KKSU BCA">KKSU BCA</option>
+                                    <option value="Diploma IT">Diploma IT</option>
+                                </select>
+                                {errors.leaderClass && <p className="mt-1 text-xs text-red-600 font-bold ml-1">{errors.leaderClass}</p>}
+                            </div>
+                        </div>
+
                         <Input
                             label="Leader Email"
                             name="leaderEmail"
@@ -348,7 +478,7 @@ export default function Register() {
                                     </button>
                                 )}
                                 <div className="text-xs text-black uppercase tracking-widest mb-3 font-black bg-brand-yellow inline-block px-2 border-2 border-black transform -rotate-1">Member {index + 1}</div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                                     <Input
                                         label="Name"
                                         name="name"
@@ -363,14 +493,48 @@ export default function Register() {
                                         onChange={(e) => handleMemberChange(index, e)}
                                         className="bg-white!"
                                     />
-                                    <Input
-                                        label="Email"
-                                        name="email"
-                                        value={member.email}
-                                        onChange={(e) => handleMemberChange(index, e)}
-                                        className="bg-white!"
-                                    />
                                 </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                    <div className="w-full mb-4">
+                                        <label className="block text-sm font-bold text-black mb-1 ml-1 uppercase tracking-wide">
+                                            Year
+                                        </label>
+                                        <select
+                                            name="year"
+                                            value={member.year}
+                                            onChange={(e) => handleMemberChange(index, e)}
+                                            className="w-full px-4 py-3 bg-white border-2 border-black rounded-lg text-black focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all appearance-none cursor-pointer"
+                                        >
+                                            <option value="" disabled>Select Year</option>
+                                            <option value="First Year">First Year</option>
+                                            <option value="Second Year">Second Year</option>
+                                            <option value="Third Year">Third Year</option>
+                                        </select>
+                                    </div>
+                                    <div className="w-full mb-4">
+                                        <label className="block text-sm font-bold text-black mb-1 ml-1 uppercase tracking-wide">
+                                            Class
+                                        </label>
+                                        <select
+                                            name="class"
+                                            value={member.class}
+                                            onChange={(e) => handleMemberChange(index, e)}
+                                            className="w-full px-4 py-3 bg-white border-2 border-black rounded-lg text-black focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all appearance-none cursor-pointer"
+                                        >
+                                            <option value="" disabled>Select Class</option>
+                                            <option value="BSC IT">BSC IT</option>
+                                            <option value="KKSU BCA">KKSU BCA</option>
+                                            <option value="Diploma IT">Diploma IT</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <Input
+                                    label="Email"
+                                    name="email"
+                                    value={member.email}
+                                    onChange={(e) => handleMemberChange(index, e)}
+                                    className="bg-white!"
+                                />
                             </div>
                         ))}
                     </div>
@@ -386,6 +550,73 @@ export default function Register() {
                             onChange={handleChange}
                             error={errors.collegeName}
                         />
+
+                        {/* Payment Section */}
+                        <div className="bg-white border-4 border-black p-6 rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                            <h3 className="text-xl font-black text-black uppercase mb-4 border-b-2 border-black pb-2 text-center">
+                                Payment Details (₹250)
+                            </h3>
+
+                            <p className="text-sm font-bold text-gray-600 mb-4 text-center">
+                                Scan the QR Code or use Bank Details below. <br />
+                                <span className="text-red-500">Collect receipt from Accounts Dept within 3 days.</span>
+                            </p>
+
+                            <div className="grid md:grid-cols-2 gap-6 text-sm font-bold text-black bg-gray-50 p-4 border-2 border-black rounded-lg mb-6">
+                                <div>
+                                    <h4 className="font-black text-brand-pink mb-2 uppercase">SBI A/C DETAILS</h4>
+                                    <p>NAME: SAHYOG COLLEGE, THANE</p>
+                                    <p>A/C NO: 31359907634</p>
+                                    <p>IFSC: SBIN0004319</p>
+                                </div>
+                                <div>
+                                    <h4 className="font-black text-brand-pink mb-2 uppercase">MAHARASHTRA BANK</h4>
+                                    <p>NAME: PRINCIPAL SAHYOG COLLEGE</p>
+                                    <p>A/C NO: 60049224734</p>
+                                    <p>IFSC: MAHB0000022</p>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col items-center justify-center mb-6">
+                                <div className="w-48 h-48 bg-gray-200 border-4 border-black flex items-center justify-center mb-2 relative">
+                                    {/* Placeholder for QR Code */}
+                                    <img src="/sahyog-qr.png" alt="Payment QR Code" className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-50">
+                                        <span className="bg-white px-2 text-xs font-bold">QR CODE</span>
+                                    </div>
+                                </div>
+                                <p className="text-xs font-bold uppercase tracking-widest">Sahyog College Thane</p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="block text-sm font-bold text-black uppercase tracking-wide">
+                                    Upload Payment Screenshot <span className="text-red-500">*</span>
+                                </label>
+                                <div className={`relative border-2 border-dashed ${errors.screenShot ? 'border-red-500 bg-red-50' : 'border-black bg-gray-50'} rounded-lg p-6 text-center transition-all hover:bg-gray-100`}>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    />
+                                    <div className="flex flex-col items-center">
+                                        {formData.screenShot ? (
+                                            <div className="text-green-600 font-black flex items-center gap-2">
+                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                                                Screenshot Uploaded
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <span className="text-2xl mb-2">📤</span>
+                                                <span className="font-bold text-gray-600">Click to Upload Payment Receipt</span>
+                                                <span className="text-xs text-gray-400 mt-1">Max 5MB. Image files only.</span>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                                {errors.screenShot && <p className="text-xs text-red-600 font-bold">{errors.screenShot}</p>}
+                            </div>
+                        </div>
 
                         <div className="p-6 bg-brand-pink/10 rounded-xl border-2 border-black border-dashed">
                             <label className="block text-md font-black text-black mb-3">
