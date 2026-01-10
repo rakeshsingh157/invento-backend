@@ -1,0 +1,14 @@
+{
+  "team_name": "Pink Email Test",
+  "idea": "Testing pink/yellow email design",
+  "gameName": "Ultimate Showdown",
+  "screenShot": "",
+  "leader": {
+    "year": "third",
+    "class": "Game Design",
+    "name": "Pink Leader",
+    "phone": "7777777777",
+    "email": "pinktest@example.com"
+  },
+  "college_name": "Design College"
+}
