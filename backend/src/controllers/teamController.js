@@ -9,6 +9,7 @@ const registerTeam = async (req, res) => {
     const teamData = req.body;
 
     // Validation
+    // Team size: Minimum 1 member (leader only), Maximum 5 members (leader + 4 additional members)
     if (!teamData.team_name) {
       return res.status(400).json({
         success: false,
@@ -16,10 +17,19 @@ const registerTeam = async (req, res) => {
       });
     }
 
-    if (!teamData.leader || !teamData.leader.name || !teamData.leader.email || !teamData.leader.phone) {
+    // Leader is required (minimum 1 member)
+    if (!teamData.leader || !teamData.leader.name || !teamData.leader.email || !teamData.leader.phone || !teamData.leader.year || !teamData.leader.class) {
       return res.status(400).json({
         success: false,
-        message: 'Leader information (name, email, phone) is required'
+        message: 'Leader information (name, email, phone, year, class) is required'
+      });
+    }
+
+    // College name is required
+    if (!teamData.college_name) {
+      return res.status(400).json({
+        success: false,
+        message: 'College name is required'
       });
     }
 
@@ -224,6 +234,36 @@ const deleteTeam = async (req, res) => {
   }
 };
 
+// @desc    Get team screenshot
+// @route   GET /api/teams/:id/screenshot
+// @access  Private (Admin only)
+const getTeamScreenshot = async (req, res) => {
+  try {
+    const team = await Team.getTeamScreenshot(req.params.id);
+
+    if (!team) {
+      return res.status(404).json({
+        success: false,
+        message: 'Team not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        team_name: team.team_name,
+        screenShot: team.screenShot || ''
+      }
+    });
+  } catch (error) {
+    console.error('Get screenshot error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching screenshot'
+    });
+  }
+};
+
 // @desc    Get team statistics
 // @route   GET /api/teams/stats
 // @access  Private (Admin only)
@@ -260,5 +300,6 @@ module.exports = {
   getTeamByName,
   updateTeam,
   deleteTeam,
-  getTeamStats
+  getTeamStats,
+  getTeamScreenshot
 };

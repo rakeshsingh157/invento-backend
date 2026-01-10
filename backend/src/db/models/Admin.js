@@ -1,4 +1,4 @@
-const { getDB } = require('../db/connection/mongodb');
+const { getDB } = require('../connection/mongodb');
 const bcrypt = require('bcryptjs');
 
 class Admin {
