@@ -18,6 +18,12 @@ const createTransporter = () => {
 // Email template for team registration - Matches pink/yellow Invento 2.0 theme
 const getRegistrationEmailTemplate = (memberName, teamName, collegeName, memberRole) => {
   return `
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,8 +40,8 @@ const getRegistrationEmailTemplate = (memberName, teamName, collegeName, memberR
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Arial Black', 'Arial Bold', Gadget, sans-serif; background: #FF69B4;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background: #FF69B4; padding: 20px;">
+<body style="margin: 0; padding: 0; font-family: 'Arial Black', 'Arial Bold', Gadget, sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style=" padding: 20px;">
         <tr>
             <td align="center">
                 <!-- Main Container -->
