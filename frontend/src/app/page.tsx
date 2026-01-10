@@ -22,12 +22,23 @@ const WavySeparator = ({ color = "#FACC15" }) => (
 
 import { Navbar } from "@/components/Navbar";
 
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
+
 export default function Home() {
+  const router = useRouter();
+  const [isHeroRegisterLoading, setIsHeroRegisterLoading] = useState(false);
+
+  const handleHeroRegister = () => {
+    setIsHeroRegisterLoading(true);
+    router.push('/register');
+  }
+
   return (
     <div className="min-h-screen font-sans bg-brand-yellow text-black selection:bg-brand-pink selection:text-white pt-20">
       <Navbar />
 
-      {/* HERO SECTION */}
       {/* HERO SECTION */}
       <section className="relative bg-brand-pink min-h-[95vh] flex flex-col pt-10 overflow-hidden">
 
@@ -53,7 +64,7 @@ export default function Home() {
               <span className="font-black text-xs md:text-sm tracking-widest uppercase">The Ultimate Showdown</span>
             </motion.div>
 
-            <h1 className="text-7xl md:text-9xl font-black text-white leading-[0.85] tracking-tighter drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+            <h1 className="text-7xl md:text-9xl font-black text-white leading-[0.85] tracking-tighter drop-shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
               Invento<br />
               <span className="text-brand-yellow text-shadow-retro relative inline-block mb-2">
                 2.0
@@ -69,15 +80,14 @@ export default function Home() {
             </p>
 
             <div className="flex flex-wrap gap-4 pt-4">
-              <Link href="/register">
-                <motion.button
-                  whileHover={{ scale: 1.05, boxShadow: "0px 0px 0px 0px #000", translate: "4px 4px" }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-brand-yellow text-black text-xl font-black px-10 py-5 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center gap-3 transition-all"
-                >
-                  Register Now <MoveRight className="w-6 h-6" />
-                </motion.button>
-              </Link>
+              <button
+                onClick={handleHeroRegister}
+                disabled={isHeroRegisterLoading}
+                className="bg-brand-yellow text-black text-xl font-black px-10 py-5 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center gap-3 transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none bg-white"
+              >
+                {isHeroRegisterLoading && <Loader2 className="w-6 h-6 animate-spin" />}
+                Register Now {!isHeroRegisterLoading && <MoveRight className="w-6 h-6" />}
+              </button>
               <Link href="#guidelines">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
