@@ -17,27 +17,38 @@ Public API endpoint for team registration with automatic email notifications to 
   "team_name": "Code Warriors",
   "idea": "AI-powered inventory management system",  // optional
   "gameName": "Space Explorer",  // optional
+  "screenShot": "",  // optional - base64 encoded image
   "leader": {
+    "year": "first",
+    "class": "BSC",
     "name": "John Doe",
     "phone": "1234567890",
     "email": "john@example.com"
   },
-  "member2": {
+  "member2": {  // optional
+    "year": "first",
+    "class": "IT",
     "name": "Jane Smith",
     "phone": "2345678901",
     "email": "jane@example.com"
   },
-  "member3": {
+  "member3": {  // optional
+    "year": "first",
+    "class": "SY-IT",
     "name": "Bob Johnson",
     "phone": "3456789012",
     "email": "bob@example.com"
   },
-  "member4": {
+  "member4": {  // optional
+    "year": "first",
+    "class": "SY-IT",
     "name": "Alice Brown",
     "phone": "4567890123",
     "email": "alice@example.com"
   },
-  "member5": {
+  "member5": {  // optional
+    "year": "first",
+    "class": "SY-IT",
     "name": "Charlie Davis",
     "phone": "5678901234",
     "email": "charlie@example.com"
@@ -48,6 +59,8 @@ Public API endpoint for team registration with automatic email notifications to 
 
 #### Required Fields
 - `team_name` - Team name (must be unique)
+- `leader.year` - Leader's academic year (e.g., "first", "second", "third", "fourth")
+- `leader.class` - Leader's class/department (e.g., "BSC", "IT", "SY-IT")
 - `leader.name` - Leader's full name
 - `leader.email` - Leader's email (must be valid and unique)
 - `leader.phone` - Leader's phone number
@@ -57,7 +70,9 @@ Public API endpoint for team registration with automatic email notifications to 
 #### Optional Fields
 - `idea` - Team's project idea or description (optional)
 - `gameName` - Game name if participating in game development category (optional)
+- `screenShot` - Base64 encoded screenshot/image of project or game (optional)
 - `member2`, `member3`, `member4`, `member5` - Additional team members (optional)
+  - Each member should include: `year`, `class`, `name`, `email`, `phone`
 - `college_name` - College/Institution name (optional)
 
 #### Success Response (201 Created)
@@ -71,26 +86,36 @@ Public API endpoint for team registration with automatic email notifications to 
       "_id": "507f1f77bcf86cd799439011",
       "team_name": "Code Warriors",
       "leader": {
+        "year": "first",
+        "class": "BSC",
         "name": "John Doe",
         "email": "john@example.com",
         "phone": "1234567890"
       },
       "member2": {
+        "year": "first",
+        "class": "IT",
         "name": "Jane Smith",
         "email": "jane@example.com",
         "phone": "2345678901"
       },
       "member3": {
+        "year": "first",
+        "class": "SY-IT",
         "name": "Bob Johnson",
         "email": "bob@example.com",
         "phone": "3456789012"
       },
       "member4": {
+        "year": "first",
+        "class": "SY-IT",
         "name": "Alice Brown",
         "email": "alice@example.com",
         "phone": "4567890123"
       },
       "member5": {
+        "year": "first",
+        "class": "SY-IT",
         "name": "Charlie Davis",
         "email": "charlie@example.com",
         "phone": "5678901234"
@@ -98,6 +123,7 @@ Public API endpoint for team registration with automatic email notifications to 
       "college_name": "XYZ College of Engineering",
       "idea": "AI-powered inventory management system",
       "gameName": "Space Explorer",
+      "screenShot": "data:image/png;base64,iVBORw0KGg...",
       "registeredAt": "2026-01-06T10:30:00.000Z",
       "status": "registered"
     },
@@ -227,12 +253,17 @@ curl -X POST http://localhost:3000/api/teams/register \
     "team_name": "Code Warriors",
     "idea": "AI-powered inventory management system",
     "gameName": "Space Explorer",
+    "screenShot": "data:image/png;base64,iVBORw0KGg...",
     "leader": {
+      "year": "first",
+      "class": "BSC",
       "name": "John Doe",
       "phone": "1234567890",
       "email": "john@example.com"
     },
     "member2": {
+      "year": "first",
+      "class": "IT",
       "name": "Jane Smith",
       "phone": "2345678901",
       "email": "jane@example.com"
