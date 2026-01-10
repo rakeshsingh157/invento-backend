@@ -20,8 +20,8 @@ class Team {
       }
 
       // Validate leader
-      if (!teamData.leader || !teamData.leader.name || !teamData.leader.email || !teamData.leader.phone) {
-        throw new Error('Leader information (name, email, phone) is required');
+      if (!teamData.leader || !teamData.leader.name || !teamData.leader.email || !teamData.leader.phone || !teamData.leader.year || !teamData.leader.class) {
+        throw new Error('Leader information (name, email, phone, year, class) is required');
       }
 
       // Check if team name already exists
@@ -55,13 +55,16 @@ class Team {
       const team = {
         team_name: teamData.team_name,
         leader: {
+          year: teamData.leader.year,
+          class: teamData.leader.class,
           name: teamData.leader.name,
           email: teamData.leader.email.toLowerCase(),
           phone: teamData.leader.phone
         },
-        college_name: teamData.college_name || '',
+        college_name: teamData.college_name,
         idea: teamData.idea || '',
         gameName: teamData.gameName || '',
+        screenShot: teamData.screenShot || '',
         registeredAt: new Date(),
         status: 'registered'
       };
@@ -70,6 +73,8 @@ class Team {
       ['member2', 'member3', 'member4', 'member5'].forEach(memberKey => {
         if (teamData[memberKey] && teamData[memberKey].name && teamData[memberKey].email) {
           team[memberKey] = {
+            year: teamData[memberKey].year || '',
+            class: teamData[memberKey].class || '',
             name: teamData[memberKey].name,
             email: teamData[memberKey].email.toLowerCase(),
             phone: teamData[memberKey].phone || ''
@@ -110,8 +115,26 @@ class Team {
   async getAllTeams() {
     try {
       const collection = this.getCollection();
-      const teams = await collection.find({}).toArray();
+      // Exclude screenshot field for faster response
+      const teams = await collection.find({}, {
+        projection: { screenShot: 0 }
+      }).toArray();
       return teams;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getTeamScreenshot(id) {
+    try {
+      const { ObjectId } = require('mongodb');
+      const collection = this.getCollection();
+      // Only fetch screenshot field
+      const team = await collection.findOne(
+        { _id: new ObjectId(id) },
+        { projection: { screenShot: 1, team_name: 1 } }
+      );
+      return team;
     } catch (error) {
       throw error;
     }
