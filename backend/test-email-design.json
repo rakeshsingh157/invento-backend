@@ -1,0 +1,21 @@
+{
+  "team_name": "Design Test Team",
+  "idea": "Testing new email design",
+  "gameName": "Email Design Showcase",
+  "screenShot": "",
+  "leader": {
+    "year": "second",
+    "class": "Computer Science",
+    "name": "Test Leader",
+    "phone": "9999999999",
+    "email": "testleader@example.com"
+  },
+  "member2": {
+    "year": "third",
+    "class": "IT",
+    "name": "Test Member 2",
+    "phone": "8888888888",
+    "email": "testmember2@example.com"
+  },
+  "college_name": "Test College"
+}
