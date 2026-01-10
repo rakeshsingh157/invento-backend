@@ -12,13 +12,18 @@ interface TeamMember {
     name: string;
     contact: string;
     email: string;
+    year: string;
+    class: string;
 }
 
 interface FormData {
     teamName: string;
+    gameName: string;
     leaderName: string;
     leaderContact: string;
     leaderEmail: string;
+    leaderYear: string;
+    leaderClass: string;
     members: TeamMember[];
     collegeName: string;
 }
@@ -28,10 +33,13 @@ export default function Register() {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState<FormData>({
         teamName: "",
+        gameName: "",
         leaderName: "",
         leaderContact: "",
         leaderEmail: "",
-        members: [{ name: "", contact: "", email: "" }],
+        leaderYear: "",
+        leaderClass: "",
+        members: [{ name: "", contact: "", email: "", year: "", class: "" }],
         collegeName: "",
     });
 
@@ -49,7 +57,7 @@ export default function Register() {
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
         // Clear error when typing
@@ -62,7 +70,7 @@ export default function Register() {
         }
     };
 
-    const handleMemberChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleMemberChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         const newMembers = [...formData.members];
         // @ts-ignore
@@ -74,7 +82,7 @@ export default function Register() {
         if (formData.members.length < 4) {
             setFormData((prev) => ({
                 ...prev,
-                members: [...prev.members, { name: "", contact: "", email: "" }],
+                members: [...prev.members, { name: "", contact: "", email: "", year: "", class: "" }],
             }));
         }
     };
@@ -103,7 +111,11 @@ export default function Register() {
         if (!formData.teamName.trim()) newErrors.teamName = "Team Name is required";
         else if (formData.teamName.length < 3) newErrors.teamName = "Team Name must be at least 3 chars";
 
+        if (!formData.gameName.trim()) newErrors.gameName = "Game Name is required";
+
         if (!formData.leaderName.trim()) newErrors.leaderName = "Leader Name is required";
+        if (!formData.leaderYear.trim()) newErrors.leaderYear = "Year is required";
+        if (!formData.leaderClass.trim()) newErrors.leaderClass = "Class is required";
 
         if (!formData.leaderContact.trim()) newErrors.leaderContact = "Contact is required";
         else if (!validatePhone(formData.leaderContact)) newErrors.leaderContact = "Invalid Phone (10 digits required)";
@@ -118,25 +130,11 @@ export default function Register() {
     const validateStep2 = () => {
         let isValid = true;
         // Logic: if a member row exists, it must be valid.
-        // But backend allows gaps? No, the mapped data skips empty rows.
-        // However, the UI forces at least "Member 1".
-        // Let's assume ANY filled field in a row requires ALL fields in that row to be valid.
-        // OR simply strict validation: All displayed member rows must be filled validly.
-
-        const newMembers = [...formData.members];
-        let hasErrors = false;
-
-        // We can't easily show per-row errors with the current 'errors' state object structure (flat keys).
-        // For now, we will just use alert for Step 2 errors or simple blocking.
-        // IMPROVEMENT: Ideally we would map errors to `members[i].field`.
-        // Given constraints, I'll stick to 'alert' for Step 2 details or generic valid check.
-        // Wait, I can't set per-field error in the current `Input` component easily for array items without changing state structure.
-        // I will adhere to the request "proper validations" by blocking invalid input and showing an alert.
 
         for (let i = 0; i < formData.members.length; i++) {
             const m = formData.members[i];
-            if (!m.name.trim() || !m.contact.trim() || !m.email.trim()) {
-                alert(`Please fill all details for Member ${i + 1}`);
+            if (!m.name.trim() || !m.contact.trim() || !m.email.trim() || !m.year.trim() || !m.class.trim()) {
+                alert(`Please fill all details (Name, Contact, Email, Year, Class) for Member ${i + 1}`);
                 return false;
             }
             if (!validatePhone(m.contact)) {
@@ -178,25 +176,27 @@ export default function Register() {
                 // Construct Payload
                 const payload: any = {
                     team_name: formData.teamName,
+                    gameName: formData.gameName,
                     leader: {
                         name: formData.leaderName,
                         phone: formData.leaderContact,
-                        email: formData.leaderEmail
+                        email: formData.leaderEmail,
+                        year: formData.leaderYear,
+                        class: formData.leaderClass
                     },
                     college_name: formData.collegeName,
-                    // Optional based on backend logic
-                    idea: "Pending", // Backend doc shows 'idea' in request body
-                    gameName: "Pending" // Backend doc shows 'gameName' optional
+                    idea: "Pending", // Default value
                 };
 
                 // Map additional members
-                // Backend expects member2, member3 etc.
                 formData.members.forEach((member, index) => {
-                    if (member.name && member.email) { // basic check
+                    if (member.name && member.email) {
                         payload[`member${index + 2}`] = {
                             name: member.name,
                             phone: member.contact,
-                            email: member.email
+                            email: member.email,
+                            year: member.year,
+                            class: member.class
                         };
                     }
                 });
@@ -285,14 +285,25 @@ export default function Register() {
 
                 {step === 1 && (
                     <div className="space-y-4 animate-in slide-in-from-right duration-300">
-                        <Input
-                            label="Studio / Team Name"
-                            name="teamName"
-                            placeholder="e.g. Pixel Pioneers"
-                            value={formData.teamName}
-                            onChange={handleChange}
-                            error={errors.teamName}
-                        />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Input
+                                label="Studio / Team Name"
+                                name="teamName"
+                                placeholder="e.g. Pixel Pioneers"
+                                value={formData.teamName}
+                                onChange={handleChange}
+                                error={errors.teamName}
+                            />
+                            <Input
+                                label="Game Name"
+                                name="gameName"
+                                placeholder="e.g. Space Invaders"
+                                value={formData.gameName}
+                                onChange={handleChange}
+                                error={errors.gameName}
+                            />
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Input
                                 label="Leader Name"
@@ -311,6 +322,45 @@ export default function Register() {
                                 error={errors.leaderContact}
                             />
                         </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="w-full mb-4">
+                                <label className="block text-sm font-bold text-black mb-1 ml-1 uppercase tracking-wide">
+                                    Leader Year
+                                </label>
+                                <select
+                                    name="leaderYear"
+                                    value={formData.leaderYear}
+                                    onChange={handleChange}
+                                    className={`w-full px-4 py-3 bg-white border-2 border-black rounded-lg text-black focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all appearance-none cursor-pointer ${errors.leaderYear ? 'border-red-500' : ''}`}
+                                >
+                                    <option value="" disabled>Select Year</option>
+                                    <option value="First Year">First Year</option>
+                                    <option value="Second Year">Second Year</option>
+                                    <option value="Third Year">Third Year</option>
+                                </select>
+                                {errors.leaderYear && <p className="mt-1 text-xs text-red-600 font-bold ml-1">{errors.leaderYear}</p>}
+                            </div>
+
+                            <div className="w-full mb-4">
+                                <label className="block text-sm font-bold text-black mb-1 ml-1 uppercase tracking-wide">
+                                    Leader Class / Division
+                                </label>
+                                <select
+                                    name="leaderClass"
+                                    value={formData.leaderClass}
+                                    onChange={handleChange}
+                                    className={`w-full px-4 py-3 bg-white border-2 border-black rounded-lg text-black focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all appearance-none cursor-pointer ${errors.leaderClass ? 'border-red-500' : ''}`}
+                                >
+                                    <option value="" disabled>Select Class</option>
+                                    <option value="BSC IT">BSC IT</option>
+                                    <option value="KKSU BCA">KKSU BCA</option>
+                                    <option value="Diploma IT">Diploma IT</option>
+                                </select>
+                                {errors.leaderClass && <p className="mt-1 text-xs text-red-600 font-bold ml-1">{errors.leaderClass}</p>}
+                            </div>
+                        </div>
+
                         <Input
                             label="Leader Email"
                             name="leaderEmail"
@@ -348,7 +398,7 @@ export default function Register() {
                                     </button>
                                 )}
                                 <div className="text-xs text-black uppercase tracking-widest mb-3 font-black bg-brand-yellow inline-block px-2 border-2 border-black transform -rotate-1">Member {index + 1}</div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                                     <Input
                                         label="Name"
                                         name="name"
@@ -363,14 +413,48 @@ export default function Register() {
                                         onChange={(e) => handleMemberChange(index, e)}
                                         className="bg-white!"
                                     />
-                                    <Input
-                                        label="Email"
-                                        name="email"
-                                        value={member.email}
-                                        onChange={(e) => handleMemberChange(index, e)}
-                                        className="bg-white!"
-                                    />
                                 </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                    <div className="w-full mb-4">
+                                        <label className="block text-sm font-bold text-black mb-1 ml-1 uppercase tracking-wide">
+                                            Year
+                                        </label>
+                                        <select
+                                            name="year"
+                                            value={member.year}
+                                            onChange={(e) => handleMemberChange(index, e)}
+                                            className="w-full px-4 py-3 bg-white border-2 border-black rounded-lg text-black focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all appearance-none cursor-pointer"
+                                        >
+                                            <option value="" disabled>Select Year</option>
+                                            <option value="First Year">First Year</option>
+                                            <option value="Second Year">Second Year</option>
+                                            <option value="Third Year">Third Year</option>
+                                        </select>
+                                    </div>
+                                    <div className="w-full mb-4">
+                                        <label className="block text-sm font-bold text-black mb-1 ml-1 uppercase tracking-wide">
+                                            Class
+                                        </label>
+                                        <select
+                                            name="class"
+                                            value={member.class}
+                                            onChange={(e) => handleMemberChange(index, e)}
+                                            className="w-full px-4 py-3 bg-white border-2 border-black rounded-lg text-black focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all appearance-none cursor-pointer"
+                                        >
+                                            <option value="" disabled>Select Class</option>
+                                            <option value="BSC IT">BSC IT</option>
+                                            <option value="KKSU BCA">KKSU BCA</option>
+                                            <option value="Diploma IT">Diploma IT</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <Input
+                                    label="Email"
+                                    name="email"
+                                    value={member.email}
+                                    onChange={(e) => handleMemberChange(index, e)}
+                                    className="bg-white!"
+                                />
                             </div>
                         ))}
                     </div>
