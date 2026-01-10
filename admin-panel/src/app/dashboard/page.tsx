@@ -9,6 +9,8 @@ interface Member {
     name: string;
     email: string;
     phone: string;
+    year?: string;
+    class?: string;
 }
 
 interface Team {
@@ -24,6 +26,7 @@ interface Team {
     gameName?: string;
     status: string;
     registeredAt: string;
+    screenShot?: string;
 }
 
 export default function DashboardPage() {
@@ -85,16 +88,16 @@ export default function DashboardPage() {
 
         const headers = [
             "Team Name",
+            "Game Name",
             "College",
             "Status",
             "Registration Date",
-            "Leader Name", "Leader Email", "Leader Phone",
-            "Member 2 Name", "Member 2 Email", "Member 2 Phone",
-            "Member 3 Name", "Member 3 Email", "Member 3 Phone",
-            "Member 4 Name", "Member 4 Email", "Member 4 Phone",
-            "Member 5 Name", "Member 5 Email", "Member 5 Phone",
-            "Project Idea",
-            "Game Name"
+            "Leader Name", "Leader Email", "Leader Phone", "Leader Year", "Leader Class",
+            "Member 2 Name", "Member 2 Email", "Member 2 Phone", "Member 2 Year", "Member 2 Class",
+            "Member 3 Name", "Member 3 Email", "Member 3 Phone", "Member 3 Year", "Member 3 Class",
+            "Member 4 Name", "Member 4 Email", "Member 4 Phone", "Member 4 Year", "Member 4 Class",
+            "Member 5 Name", "Member 5 Email", "Member 5 Phone", "Member 5 Year", "Member 5 Class",
+            "Payment Screenshot"
         ];
 
         const csvRows = [headers.join(",")];
@@ -102,22 +105,26 @@ export default function DashboardPage() {
         teams.forEach(team => {
             const row = [
                 `"${team.team_name.replace(/"/g, '""')}"`,
+                `"${(team.gameName || "").replace(/"/g, '""')}"`,
                 `"${(team.college_name || "").replace(/"/g, '""')}"`,
                 `"${team.status || "registered"}"`,
                 `"${new Date(team.registeredAt).toLocaleDateString()}"`,
 
                 // Leader
-                `"${team.leader.name}"`, `"${team.leader.email}"`, `"${team.leader.phone}"`,
+                `"${team.leader.name}"`,
+                `"${team.leader.email}"`,
+                `"${team.leader.phone}"`,
+                `"${team.leader.year || ""}"`,
+                `"${team.leader.class || ""}"`,
 
                 // Members (2-5)
-                `"${team.member2?.name || ""}"`, `"${team.member2?.email || ""}"`, `"${team.member2?.phone || ""}"`,
-                `"${team.member3?.name || ""}"`, `"${team.member3?.email || ""}"`, `"${team.member3?.phone || ""}"`,
-                `"${team.member4?.name || ""}"`, `"${team.member4?.email || ""}"`, `"${team.member4?.phone || ""}"`,
-                `"${team.member5?.name || ""}"`, `"${team.member5?.email || ""}"`, `"${team.member5?.phone || ""}"`,
+                `"${team.member2?.name || ""}"`, `"${team.member2?.email || ""}"`, `"${team.member2?.phone || ""}"`, `"${team.member2?.year || ""}"`, `"${team.member2?.class || ""}"`,
+                `"${team.member3?.name || ""}"`, `"${team.member3?.email || ""}"`, `"${team.member3?.phone || ""}"`, `"${team.member3?.year || ""}"`, `"${team.member3?.class || ""}"`,
+                `"${team.member4?.name || ""}"`, `"${team.member4?.email || ""}"`, `"${team.member4?.phone || ""}"`, `"${team.member4?.year || ""}"`, `"${team.member4?.class || ""}"`,
+                `"${team.member5?.name || ""}"`, `"${team.member5?.email || ""}"`, `"${team.member5?.phone || ""}"`, `"${team.member5?.year || ""}"`, `"${team.member5?.class || ""}"`,
 
-                // Extra
-                `"${(team.idea || "").replace(/"/g, '""')}"`,
-                `"${(team.gameName || "").replace(/"/g, '""')}"`
+                // Payment
+                `"${team.screenShot ? "Yes" : "No"}"`
             ];
             csvRows.push(row.join(","));
         });
@@ -136,6 +143,15 @@ export default function DashboardPage() {
         team.team_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         team.leader.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    // Function to open screenshot in new tab
+    const viewScreenshot = (screenShot: string) => {
+        const win = window.open();
+        if (win) {
+            win.document.write(`<img src="${screenShot}" style="max-width:100%; height:auto;" />`);
+            win.document.title = "Payment Receipt";
+        }
+    };
 
     return (
         <div className="min-h-screen bg-yellow-50 font-sans text-gray-900 pb-8">
@@ -230,19 +246,27 @@ export default function DashboardPage() {
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="bg-gray-100 border-b-2 border-black font-display tracking-wider text-sm uppercase">
-                                        <th className="p-4 border-r-2 border-black">Team Name</th>
+                                        <th className="p-4 border-r-2 border-black">Team / Game</th>
                                         <th className="p-4 border-r-2 border-black">College</th>
                                         <th className="p-4 border-r-2 border-black">Leader</th>
                                         <th className="p-4 border-r-2 border-black">Members</th>
-                                        <th className="p-4 border-r-2 border-black">Saved At</th>
+                                        <th className="p-4 border-r-2 border-black">Payment</th>
                                         <th className="p-4">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody className="font-mono text-sm">
                                     {filteredTeams.length > 0 ? filteredTeams.map((team) => (
                                         <tr key={team._id} className="border-b border-gray-200 hover:bg-yellow-50 transition-colors">
-                                            <td className="p-4 border-r border-gray-200 font-bold text-brand-pink">
-                                                {team.team_name}
+                                            <td className="p-4 border-r border-gray-200">
+                                                <div className="font-bold text-brand-pink text-base">{team.team_name}</div>
+                                                {team.gameName && (
+                                                    <div className="text-xs bg-black text-white px-2 py-0.5 rounded-full inline-block mt-1">
+                                                        🎮 {team.gameName}
+                                                    </div>
+                                                )}
+                                                <div className="text-xs text-gray-500 mt-2">
+                                                    Saved: {new Date(team.registeredAt).toLocaleDateString()}
+                                                </div>
                                             </td>
                                             <td className="p-4 border-r border-gray-200 max-w-50 truncate" title={team.college_name}>
                                                 {team.college_name || "N/A"}
@@ -251,6 +275,11 @@ export default function DashboardPage() {
                                                 <div className="font-bold">{team.leader.name}</div>
                                                 <div className="text-xs text-gray-500">{team.leader.email}</div>
                                                 <div className="text-xs text-gray-500">{team.leader.phone}</div>
+                                                {(team.leader.year || team.leader.class) && (
+                                                    <div className="text-xs bg-gray-200 px-1 py-0.5 rounded mt-1 inline-block">
+                                                        {team.leader.year} • {team.leader.class}
+                                                    </div>
+                                                )}
                                             </td>
                                             <td className="p-4 border-r border-gray-200">
                                                 <div className="flex flex-col gap-2">
@@ -258,15 +287,29 @@ export default function DashboardPage() {
                                                         member && member.name ? (
                                                             <div key={idx} className="text-xs border-b border-gray-100 last:border-0 pb-1 last:pb-0">
                                                                 <span className="font-bold block">{member.name}</span>
-                                                                <span className="text-gray-500">{member.phone}</span>
+                                                                <div className="flex justify-between items-center text-gray-500 text-[10px]">
+                                                                    <span>{member.phone}</span>
+                                                                    {(member.year || member.class) && (
+                                                                        <span>{member.year} - {member.class}</span>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         ) : null
                                                     ))}
                                                     {(!team.member2) && <span className="text-gray-400 italic text-xs">No other members</span>}
                                                 </div>
                                             </td>
-                                            <td className="p-4 border-r border-gray-200">
-                                                {new Date(team.registeredAt).toLocaleDateString()}
+                                            <td className="p-4 border-r border-gray-200 text-center">
+                                                {team.screenShot ? (
+                                                    <button
+                                                        onClick={() => viewScreenshot(team.screenShot!)}
+                                                        className="text-xs bg-green-100 text-green-700 border border-green-500 px-2 py-1 rounded font-bold hover:bg-green-200"
+                                                    >
+                                                        View Receipt
+                                                    </button>
+                                                ) : (
+                                                    <span className="text-gray-400 text-xs italic">No Receipt</span>
+                                                )}
                                             </td>
                                             <td className="p-4">
                                                 <span className={`inline-block px-2 py-1 rounded-full text-xs font-bold border border-black ${team.status === 'registered' ? 'bg-green-100 text-green-800' : 'bg-gray-100'}`}>
@@ -296,20 +339,38 @@ export default function DashboardPage() {
                                 >
                                     <div className="flex justify-between items-start mb-3 border-b-2 border-gray-100 pb-2">
                                         <div>
-                                            <h3 className="font-display text-xl text-brand-pink">{team.team_name}</h3>
-                                            <p className="text-xs text-gray-500 font-mono truncate max-w-50">{team.college_name || "No College"}</p>
+                                            <h3 className="font-display text-xl text-brand-pink leading-none mb-1">{team.team_name}</h3>
+                                            {team.gameName && (
+                                                <div className="text-[10px] bg-black text-white px-1.5 py-0.5 rounded inline-block">
+                                                    {team.gameName}
+                                                </div>
+                                            )}
+                                            <p className="text-xs text-gray-500 font-mono truncate max-w-50 mt-1">{team.college_name || "No College"}</p>
                                         </div>
-                                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold border border-black uppercase ${team.status === 'registered' ? 'bg-green-100 text-green-800' : 'bg-gray-100'}`}>
-                                            {team.status}
-                                        </span>
+                                        <div className="flex flex-col items-end gap-1">
+                                            <span className={`px-2 py-1 rounded-full text-[10px] font-bold border border-black uppercase ${team.status === 'registered' ? 'bg-green-100 text-green-800' : 'bg-gray-100'}`}>
+                                                {team.status}
+                                            </span>
+                                            {team.screenShot && (
+                                                <button
+                                                    onClick={() => viewScreenshot(team.screenShot!)}
+                                                    className="text-[10px] text-blue-600 font-bold underline"
+                                                >
+                                                    View Receipt
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <div className="space-y-3 text-sm">
                                         <div className="bg-gray-50 p-2 rounded border border-gray-200">
                                             <p className="font-bold text-xs uppercase text-gray-400 mb-1">Team Leader</p>
                                             <p className="font-bold">{team.leader.name}</p>
-                                            <p className="font-mono text-xs text-gray-600 break-all">{team.leader.email}</p>
-                                            <p className="font-mono text-xs text-gray-600">{team.leader.phone}</p>
+                                            <div className="flex justify-between items-center text-xs text-gray-600 mt-1">
+                                                <p className="font-mono">{team.leader.phone}</p>
+                                                {(team.leader.year || team.leader.class) && <span>{team.leader.year} • {team.leader.class}</span>}
+                                            </div>
+                                            <p className="font-mono text-xs text-gray-500 truncate">{team.leader.email}</p>
                                         </div>
 
                                         {/* Additional Members for Mobile */}
@@ -319,9 +380,12 @@ export default function DashboardPage() {
                                                 <div className="space-y-2">
                                                     {[team.member2, team.member3, team.member4, team.member5].map((member, idx) => (
                                                         member && member.name ? (
-                                                            <div key={idx} className="text-xs border-b border-gray-100 last:border-0 pb-1 last:pb-0 flex justify-between">
-                                                                <span className="font-bold">{member.name}</span>
-                                                                <span className="font-mono text-gray-500">{member.phone}</span>
+                                                            <div key={idx} className="text-xs border-b border-gray-100 last:border-0 pb-1 last:pb-0">
+                                                                <div className="flex justify-between font-bold">
+                                                                    <span>{member.name}</span>
+                                                                    {(member.year || member.class) && <span className="font-normal text-[10px] text-gray-500">{member.year} {member.class}</span>}
+                                                                </div>
+                                                                <span className="font-mono text-gray-500 block">{member.phone}</span>
                                                             </div>
                                                         ) : null
                                                     ))}

@@ -26,6 +26,7 @@ interface FormData {
     leaderClass: string;
     members: TeamMember[];
     collegeName: string;
+    screenShot: string;
 }
 
 export default function Register() {
@@ -41,6 +42,7 @@ export default function Register() {
         leaderClass: "",
         members: [{ name: "", contact: "", email: "", year: "", class: "" }],
         collegeName: "",
+        screenShot: "",
     });
 
     // Captcha State
@@ -67,6 +69,28 @@ export default function Register() {
                 delete newErrors[name];
                 return newErrors;
             });
+        }
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB
+                alert("File size too large (max 5MB)");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData(prev => ({ ...prev, screenShot: reader.result as string }));
+                if (errors.screenShot) {
+                    setErrors((prev) => {
+                        const newErrors = { ...prev };
+                        delete newErrors.screenShot;
+                        return newErrors;
+                    });
+                }
+            };
+            reader.readAsDataURL(file);
         }
     };
 
@@ -153,6 +177,7 @@ export default function Register() {
     const validateStep3 = () => {
         const newErrors: { [key: string]: string } = {};
         if (!formData.collegeName.trim()) newErrors.collegeName = "College Name is required";
+        if (!formData.screenShot) newErrors.screenShot = "Payment Screenshot is required";
 
         if (parseInt(userCaptcha) !== captcha.answer) {
             setCaptchaError("Incorrect Captcha Answer");
@@ -185,6 +210,7 @@ export default function Register() {
                         class: formData.leaderClass
                     },
                     college_name: formData.collegeName,
+                    screenShot: formData.screenShot,
                     idea: "Pending", // Default value
                 };
 
@@ -470,6 +496,73 @@ export default function Register() {
                             onChange={handleChange}
                             error={errors.collegeName}
                         />
+
+                        {/* Payment Section */}
+                        <div className="bg-white border-4 border-black p-6 rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                            <h3 className="text-xl font-black text-black uppercase mb-4 border-b-2 border-black pb-2 text-center">
+                                Payment Details (₹250)
+                            </h3>
+
+                            <p className="text-sm font-bold text-gray-600 mb-4 text-center">
+                                Scan the QR Code or use Bank Details below. <br />
+                                <span className="text-red-500">Collect receipt from Accounts Dept within 3 days.</span>
+                            </p>
+
+                            <div className="grid md:grid-cols-2 gap-6 text-sm font-bold text-black bg-gray-50 p-4 border-2 border-black rounded-lg mb-6">
+                                <div>
+                                    <h4 className="font-black text-brand-pink mb-2 uppercase">SBI A/C DETAILS</h4>
+                                    <p>NAME: SAHYOG COLLEGE, THANE</p>
+                                    <p>A/C NO: 31359907634</p>
+                                    <p>IFSC: SBIN0004319</p>
+                                </div>
+                                <div>
+                                    <h4 className="font-black text-brand-pink mb-2 uppercase">MAHARASHTRA BANK</h4>
+                                    <p>NAME: PRINCIPAL SAHYOG COLLEGE</p>
+                                    <p>A/C NO: 60049224734</p>
+                                    <p>IFSC: MAHB0000022</p>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col items-center justify-center mb-6">
+                                <div className="w-48 h-48 bg-gray-200 border-4 border-black flex items-center justify-center mb-2 relative">
+                                    {/* Placeholder for QR Code */}
+                                    <img src="/assets/payment-qr.png" alt="Payment QR Code" className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-50">
+                                        <span className="bg-white px-2 text-xs font-bold">QR CODE</span>
+                                    </div>
+                                </div>
+                                <p className="text-xs font-bold uppercase tracking-widest">Sahyog College Thane</p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="block text-sm font-bold text-black uppercase tracking-wide">
+                                    Upload Payment Screenshot <span className="text-red-500">*</span>
+                                </label>
+                                <div className={`relative border-2 border-dashed ${errors.screenShot ? 'border-red-500 bg-red-50' : 'border-black bg-gray-50'} rounded-lg p-6 text-center transition-all hover:bg-gray-100`}>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    />
+                                    <div className="flex flex-col items-center">
+                                        {formData.screenShot ? (
+                                            <div className="text-green-600 font-black flex items-center gap-2">
+                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                                                Screenshot Uploaded
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <span className="text-2xl mb-2">📤</span>
+                                                <span className="font-bold text-gray-600">Click to Upload Payment Receipt</span>
+                                                <span className="text-xs text-gray-400 mt-1">Max 5MB. Image files only.</span>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                                {errors.screenShot && <p className="text-xs text-red-600 font-bold">{errors.screenShot}</p>}
+                            </div>
+                        </div>
 
                         <div className="p-6 bg-brand-pink/10 rounded-xl border-2 border-black border-dashed">
                             <label className="block text-md font-black text-black mb-3">
