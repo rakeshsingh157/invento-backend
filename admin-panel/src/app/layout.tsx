@@ -17,7 +17,7 @@ const fjalla = Fjalla_One({
 
 export const metadata: Metadata = {
   title: "Invento Admin Panel",
-  description: "Admin panel for Invento hackathon management.",
+  description: "Admin panel for Invento Gamathon management.",
 };
 
 export default function RootLayout({

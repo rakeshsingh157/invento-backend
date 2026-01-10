@@ -22,12 +22,23 @@ const WavySeparator = ({ color = "#FACC15" }) => (
 
 import { Navbar } from "@/components/Navbar";
 
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
+
 export default function Home() {
+  const router = useRouter();
+  const [isHeroRegisterLoading, setIsHeroRegisterLoading] = useState(false);
+
+  const handleHeroRegister = () => {
+    setIsHeroRegisterLoading(true);
+    router.push('/register');
+  }
+
   return (
     <div className="min-h-screen font-sans bg-brand-yellow text-black selection:bg-brand-pink selection:text-white pt-20">
       <Navbar />
 
-      {/* HERO SECTION */}
       {/* HERO SECTION */}
       <section className="relative bg-brand-pink min-h-[95vh] flex flex-col pt-10 overflow-hidden">
 
@@ -53,7 +64,7 @@ export default function Home() {
               <span className="font-black text-xs md:text-sm tracking-widest uppercase">The Ultimate Showdown</span>
             </motion.div>
 
-            <h1 className="text-7xl md:text-9xl font-black text-white leading-[0.85] tracking-tighter drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+            <h1 className="text-7xl md:text-9xl font-black text-white leading-[0.85] tracking-tighter drop-shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
               Invento<br />
               <span className="text-brand-yellow text-shadow-retro relative inline-block mb-2">
                 2.0
@@ -65,19 +76,18 @@ export default function Home() {
 
             <p className="text-xl md:text-2xl font-bold max-w-lg text-black bg-white/50 backdrop-blur-sm p-4 rounded-xl border-2 border-black/10 mt-12">
               Unlimited coffee, code, and chaos. <br />
-              <span className="text-brand-pink bg-black px-2 mt-1 inline-block transform -rotate-1 text-white">Join the 48-hour challenge.</span>
+              <span className="text-brand-pink bg-black px-2 mt-1 inline-block transform -rotate-1 text-white">Join the Invento Gamathon.</span>
             </p>
 
             <div className="flex flex-wrap gap-4 pt-4">
-              <Link href="/register">
-                <motion.button
-                  whileHover={{ scale: 1.05, boxShadow: "0px 0px 0px 0px #000", translate: "4px 4px" }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-brand-yellow text-black text-xl font-black px-10 py-5 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center gap-3 transition-all"
-                >
-                  Register Now <MoveRight className="w-6 h-6" />
-                </motion.button>
-              </Link>
+              <button
+                onClick={handleHeroRegister}
+                disabled={isHeroRegisterLoading}
+                className="bg-brand-yellow text-black text-xl font-black px-10 py-5 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center gap-3 transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
+              >
+                {isHeroRegisterLoading && <Loader2 className="w-6 h-6 animate-spin" />}
+                Register Now {!isHeroRegisterLoading && <MoveRight className="w-6 h-6" />}
+              </button>
               <Link href="#guidelines">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -121,8 +131,7 @@ export default function Home() {
               transition={{ duration: 5, repeat: Infinity }}
               className="absolute top-10 right-0 md:-right-10 bg-brand-orange border-4 border-black p-4 rounded-full shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] z-20 flex flex-col items-center justify-center w-24 h-24 md:w-32 md:h-32 transform rotate-12"
             >
-              <span className="font-black text-2xl md:text-4xl">48</span>
-              <span className="font-bold text-xs uppercase leading-none">Hours</span>
+              <span className="font-black text-2xl md:text-4xl">&lt;/&gt;</span>
             </motion.div>
           </motion.div>
         </div>
@@ -130,7 +139,7 @@ export default function Home() {
         {/* Marquee Ticker */}
         <div className="bg-black text-brand-yellow overflow-hidden py-3 border-y-4 border-black mt-auto relative z-20">
           <div className="whitespace-nowrap animate-marquee flex gap-8">
-            {Array(10).fill("REGISTER NOW • CODEBUG HACKATHON • WIN PRIZES • ").map((text, i) => (
+            {Array(10).fill("REGISTER NOW • Invento Gamathon • WIN PRIZES • ").map((text, i) => (
               <span key={i} className="text-xl md:text-2xl font-black tracking-wider uppercase">{text}</span>
             ))}
           </div>
